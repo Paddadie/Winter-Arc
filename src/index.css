@@ -1,0 +1,67 @@
+:root {
+  color-scheme: light;
+
+  /* Couleurs — deux mondes : la profondeur (apnée) et la chaleur de la progression (régime) */
+  --color-surface: #F5F7F7;        /* fond principal, blanc cassé froid */
+  --color-surface-raised: #FFFFFF; /* cartes */
+  --color-ink: #0F2027;            /* texte principal, bleu-nuit quasi noir */
+  --color-ink-muted: #5C7079;      /* texte secondaire */
+  --color-border: #E1E7E8;
+
+  --color-depth: #123542;          /* bleu profond — univers apnée */
+  --color-depth-soft: #1B4B5C;
+  --color-teal: #0E7C86;           /* accent apnée */
+  --color-teal-soft: #E4F1F2;
+
+  --color-coral: #E27D46;          /* accent régime / progression */
+  --color-coral-soft: #FCEBE0;
+
+  --color-success: #3F8F5F;        /* jour de sport */
+  --color-alert: #C9483A;          /* écart alimentaire / pire perf */
+
+  /* Typographie — SF Pro (système iOS), Rounded pour les chiffres héros */
+  --font-body: -apple-system, "SF Pro Text", system-ui, sans-serif;
+  --font-display: ui-rounded, "SF Pro Rounded", -apple-system, system-ui, sans-serif;
+
+  --radius-s: 10px;
+  --radius-m: 16px;
+  --radius-l: 24px;
+
+  --space-xs: 4px;
+  --space-s: 8px;
+  --space-m: 16px;
+  --space-l: 24px;
+  --space-xl: 32px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
+}
+
+#root {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
