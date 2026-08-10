@@ -2,6 +2,7 @@ import { HashRouter, Routes, Route } from "react-router-dom";
 import { HomePage } from "./features/home/HomePage";
 import { WeightPage } from "./features/weight/WeightPage";
 import { ApneaPage } from "./features/apnea/ApneaPage";
+import { DebugPage } from "./features/debug/DebugPage";
 
 /**
  * HashRouter (plutôt que BrowserRouter) : indispensable en PWA installée
@@ -15,6 +16,7 @@ export default function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/regime" element={<WeightPage />} />
         <Route path="/apnee" element={<ApneaPage />} />
+        <Route path="/debug" element={<DebugPage />} />
       </Routes>
     </HashRouter>
   );
