@@ -98,7 +98,7 @@ export function GoalForm({ currentGoal, latestWeightKg, onSaved, onCancel }: Goa
         </label>
       </div>
 
-      {error && <p className="goal-form-error">{error}</p>}
+      {error && <p className="form-error">{error}</p>}
 
       <div className="goal-form-actions">
         {onCancel && (

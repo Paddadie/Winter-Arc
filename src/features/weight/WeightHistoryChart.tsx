@@ -61,7 +61,7 @@ export function WeightHistoryChart({ series, hasGoal, onSelectDate, onVisibleRan
   if (!hasAnyWeight) {
     return (
       <Card>
-        <p className="weight-history-empty">Aucune pesée enregistrée pour le moment.</p>
+        <p className="empty-message">Aucune pesée enregistrée pour le moment.</p>
       </Card>
     );
   }

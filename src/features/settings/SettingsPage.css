@@ -28,19 +28,6 @@
   opacity: 0.5;
 }
 
-.settings-feedback {
-  margin: 8px 0 0 0;
-  font-size: 13px;
-  color: var(--color-success);
-  font-weight: 600;
-}
-
-.settings-error {
-  margin: 8px 0 0 0;
-  font-size: 13px;
-  color: var(--color-alert);
-}
-
 .settings-hidden {
   display: none;
 }

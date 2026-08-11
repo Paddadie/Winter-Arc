@@ -35,7 +35,7 @@ export function WeightChart({ series, hasGoal, onSelectDate }: WeightChartProps)
       <CardLabel className="card-label--chart">Évolution récente</CardLabel>
 
       {!hasAnyWeight ? (
-        <p className="weight-chart-empty">Enregistre quelques pesées pour voir le graphique apparaître.</p>
+        <p className="empty-message empty-message--spacious">Enregistre quelques pesées pour voir le graphique apparaître.</p>
       ) : (
         <div className="weight-chart-canvas">
           <ResponsiveContainer>

@@ -42,7 +42,7 @@ export function ApneaHistoryPage() {
   if (loading) {
     return (
       <PageLayout title="Historique" accentColor="var(--color-teal)" backTo="/apnee" backLabel="Apnée">
-        <p className="apnea-history-loading">Chargement…</p>
+        <p className="text-muted">Chargement…</p>
       </PageLayout>
     );
   }
@@ -71,7 +71,7 @@ export function ApneaHistoryPage() {
 
       <Card className="apnea-history-table-card">
         {filtered.length === 0 ? (
-          <p className="apnea-history-empty">Aucune mesure sur cette période.</p>
+          <p className="empty-message apnea-history-empty">Aucune mesure sur cette période.</p>
         ) : (
           <div>
             {filtered.map((session, i) => (

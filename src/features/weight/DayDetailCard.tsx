@@ -17,9 +17,9 @@ export function DayDetailCard({ point, onClose }: DayDetailCardProps) {
     <BottomSheet onClose={onClose}>
       {(close) => (
         <Card className="card--sheet">
-          <div className="day-detail-header">
+          <div className="sheet-header">
             <p className="day-detail-title">{formatFullDate(point.date)}</p>
-            <button onClick={close} aria-label="Fermer" className="day-detail-close-button">
+            <button onClick={close} aria-label="Fermer" className="close-button">
               ✕
             </button>
           </div>
@@ -59,7 +59,7 @@ function DetailRow({ label, value, variant }: { label: string; value: string; va
   return (
     <div className="detail-row">
       <span className="detail-row-label">{label}</span>
-      <span className={`detail-row-value ${variant ? `detail-row-value--${variant}` : ""}`}>{value}</span>
+      <span className={`detail-row-value ${variant ? `text-${variant}` : ""}`}>{value}</span>
     </div>
   );
 }

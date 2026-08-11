@@ -35,12 +35,6 @@
   font-weight: 600;
 }
 
-.goal-form-error {
-  margin: var(--space-s) 0 0 0;
-  font-size: 13px;
-  color: var(--color-alert);
-}
-
 .goal-form-actions {
   display: flex;
   gap: var(--space-s);

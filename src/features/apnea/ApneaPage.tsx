@@ -107,15 +107,15 @@ export function ApneaPage() {
           <TimerButton label="Enregistrer" onClick={handleSave} variant="filled" tone="depth" disabled={isRunning} />
         </div>
 
-        {savedFeedback && <p className="apnea-feedback">✓ Enregistré</p>}
-        {saveError && <p className="apnea-error">{saveError}</p>}
+        {savedFeedback && <p className="form-feedback">✓ Enregistré</p>}
+        {saveError && <p className="form-error">{saveError}</p>}
       </Card>
 
       <Card>
         <CardLabel>Aujourd'hui</CardLabel>
 
         {todaySessions.length === 0 ? (
-          <p className="apnea-empty-message">Aucune mesure enregistrée aujourd'hui.</p>
+          <p className="empty-message">Aucune mesure enregistrée aujourd'hui.</p>
         ) : (
           <>
             {todayAverage !== null && todaySessions.length > 1 && (
@@ -156,7 +156,7 @@ function WindowStatsCard({ stats }: { stats: ApneaWindowStats | null }) {
       {showInfo && <WindowStatsInfoSheet stats={stats} onClose={() => setShowInfo(false)} />}
 
       {stats === null ? (
-        <p className="apnea-empty-message apnea-stats-empty">Pas assez de données sur les {STATS_WINDOW_DAYS} derniers jours.</p>
+        <p className="empty-message apnea-stats-empty">Pas assez de données sur les {STATS_WINDOW_DAYS} derniers jours.</p>
       ) : (
         <>
           <p className="apnea-stats-average">{formatDuration(stats.averageSec)}</p>
@@ -164,13 +164,13 @@ function WindowStatsCard({ stats }: { stats: ApneaWindowStats | null }) {
 
           <div className="apnea-stats-row">
             <div>
-              <p className="apnea-stats-value apnea-stats-value--alert">
+              <p className="apnea-stats-value text-alert">
                 +{formatDuration(stats.averageSec - stats.worst.durationSec)}
               </p>
               <p className="apnea-stats-sublabel">pire perf.</p>
             </div>
             <div>
-              <p className="apnea-stats-value apnea-stats-value--success">
+              <p className="apnea-stats-value text-success">
                 -{formatDuration(stats.best.durationSec - stats.averageSec)}
               </p>
               <p className="apnea-stats-sublabel">meilleure perf.</p>
@@ -187,15 +187,15 @@ function WindowStatsInfoSheet({ stats, onClose }: { stats: ApneaWindowStats | nu
     <BottomSheet onClose={onClose}>
       {(close) => (
         <Card className="card--sheet">
-          <div className="apnea-info-header">
+          <div className="sheet-header">
             <p className="apnea-info-title">Pire / meilleure performance</p>
-            <button onClick={close} aria-label="Fermer" className="apnea-info-close-button">
+            <button onClick={close} aria-label="Fermer" className="close-button">
               ✕
             </button>
           </div>
 
           <p className="apnea-info-text">
-            <strong className="apnea-info-strong--alert">Pire perf.</strong> : l'écart entre ta mesure la plus
+            <strong className="text-alert">Pire perf.</strong> : l'écart entre ta mesure la plus
             courte et ta moyenne sur les {STATS_WINDOW_DAYS} derniers jours. Plus ce nombre est petit, plus tes
             performances sont régulières.
           </p>
@@ -208,7 +208,7 @@ function WindowStatsInfoSheet({ stats, onClose }: { stats: ApneaWindowStats | nu
           )}
 
           <p className="apnea-info-text">
-            <strong className="apnea-info-strong--success">Meilleure perf.</strong> : l'écart entre ta mesure la
+            <strong className="text-success">Meilleure perf.</strong> : l'écart entre ta mesure la
             plus longue et cette même moyenne. Plus ce nombre est grand, plus tu as dépassé ta moyenne.
           </p>
           {stats && (
@@ -247,7 +247,7 @@ function RecentPerformancesCard({ sessions }: { sessions: ApneaSession[] }) {
       <CardLabel>Performances récentes</CardLabel>
 
       {shownDates.length === 0 ? (
-        <p className="apnea-empty-message">
+        <p className="empty-message">
           Pas encore de mesure sur les {RECENT_LOOKBACK_DAYS} derniers jours (hors aujourd'hui).
         </p>
       ) : (

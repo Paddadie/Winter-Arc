@@ -11,7 +11,7 @@ export function StatBlock({ label, value, variant }: StatBlockProps) {
   return (
     <div>
       <p className="stat-block-label">{label}</p>
-      <p className={`stat-block-value ${variant ? `stat-block-value--${variant}` : ""}`}>{value}</p>
+      <p className={`stat-block-value ${variant ? `text-${variant}` : ""}`}>{value}</p>
     </div>
   );
 }

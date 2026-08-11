@@ -82,7 +82,7 @@ export function SettingsPage() {
         <button onClick={handleExport} className="settings-button settings-button--filled">
           Exporter mes données (JSON)
         </button>
-        {exportFeedback && <p className="settings-feedback">✓ Fichier téléchargé</p>}
+        {exportFeedback && <p className="form-feedback">✓ Fichier téléchargé</p>}
         <a ref={downloadLinkRef} className="settings-hidden" />
       </Card>
 
@@ -106,7 +106,7 @@ export function SettingsPage() {
         >
           {importing ? "Import en cours…" : "Importer un fichier JSON"}
         </button>
-        {importError && <p className="settings-error">{importError}</p>}
+        {importError && <p className="form-error">{importError}</p>}
       </Card>
     </PageLayout>
   );

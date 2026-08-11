@@ -1,7 +1,3 @@
-.apnea-history-loading {
-  color: var(--color-ink-muted);
-}
-
 .apnea-history-period-row {
   display: flex;
   gap: var(--space-s);
@@ -30,8 +26,6 @@
 
 .apnea-history-empty {
   margin: var(--space-s) 0;
-  color: var(--color-ink-muted);
-  font-size: 14px;
 }
 
 .apnea-history-row {

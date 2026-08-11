@@ -22,7 +22,7 @@ export function ApneaProgressionChart({ points }: ApneaProgressionChartProps) {
       <CardLabel className="card-label--chart">Progression</CardLabel>
 
       {points.length === 0 ? (
-        <p className="apnea-progression-empty">Aucune mesure sur cette période.</p>
+        <p className="empty-message empty-message--spacious">Aucune mesure sur cette période.</p>
       ) : (
         <div className="apnea-progression-canvas">
           <ResponsiveContainer>

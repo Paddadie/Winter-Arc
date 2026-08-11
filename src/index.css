@@ -65,3 +65,62 @@ button {
     transition-duration: 0.01ms !important;
   }
 }
+
+/*
+ * Utilitaires partagés entre les features (Régime, Apnée, Réglages, Accueil).
+ * Chaque règle ici remplaçait au moins deux copies identiques dans des
+ * fichiers CSS séparés — factorisées ici pour éviter la duplication tout
+ * en gardant les classes structurelles (mise en page) dans leur feature.
+ */
+
+.text-muted {
+  color: var(--color-ink-muted);
+}
+
+.text-success {
+  color: var(--color-success);
+}
+
+.text-alert {
+  color: var(--color-alert);
+}
+
+.empty-message {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-ink-muted);
+}
+
+.empty-message--spacious {
+  margin: var(--space-l) var(--space-m);
+}
+
+.form-feedback {
+  margin: var(--space-s) 0 0 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-success);
+}
+
+.form-error {
+  margin: var(--space-s) 0 0 0;
+  font-size: 13px;
+  color: var(--color-alert);
+}
+
+.close-button {
+  border: none;
+  background: var(--color-surface);
+  color: var(--color-ink-muted);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 15px;
+}
+
+.sheet-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-s);
+}

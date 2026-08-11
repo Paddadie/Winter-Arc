@@ -119,8 +119,8 @@ export function DayEntryCard({ entries, onSaved }: DayEntryCardProps) {
         </button>
       </div>
 
-      {savedFeedback && <p className="day-entry-feedback">✓ Enregistré</p>}
-      {weightError && <p className="day-entry-error">{weightError}</p>}
+      {savedFeedback && <p className="form-feedback">✓ Enregistré</p>}
+      {weightError && <p className="form-error">{weightError}</p>}
 
       <div className="day-entry-chips-row">
         <Chip label="🏃 Sport" active={sport} variant="success" onClick={toggleSport} />

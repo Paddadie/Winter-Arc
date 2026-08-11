@@ -51,7 +51,7 @@ export function WeightPage() {
   if (loading) {
     return (
       <PageLayout title="Régime" accentColor="var(--color-coral)">
-        <p className="weight-page-loading">Chargement…</p>
+        <p className="text-muted">Chargement…</p>
       </PageLayout>
     );
   }

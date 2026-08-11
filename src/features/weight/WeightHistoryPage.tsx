@@ -36,7 +36,7 @@ export function WeightHistoryPage() {
   if (loading) {
     return (
       <PageLayout title="Historique" accentColor="var(--color-coral)" backTo="/regime" backLabel="Régime">
-        <p className="weight-history-loading">Chargement…</p>
+        <p className="text-muted">Chargement…</p>
       </PageLayout>
     );
   }
@@ -76,7 +76,7 @@ function PeriodStats({ series }: { series: WeightSeriesPoint[] }) {
   if (realPoints.length === 0 || series.length === 0) {
     return (
       <Card>
-        <p className="period-stats-empty">Aucune donnée de poids sur la période affichée.</p>
+        <p className="empty-message">Aucune donnée de poids sur la période affichée.</p>
       </Card>
     );
   }
