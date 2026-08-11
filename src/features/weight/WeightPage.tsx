@@ -3,20 +3,29 @@ import { PageLayout } from "../../components/PageLayout";
 import { QuickWeightEntry } from "./QuickWeightEntry";
 import { GoalForm } from "./GoalForm";
 import { WeightSummaryCard } from "./WeightSummaryCard";
+import { WeightChart } from "./WeightChart";
 import { getActiveGoal } from "../../db/goalRepo";
-import { getLatestWeightEntry } from "../../db/weightRepo";
+import { getAllWeightEntries, getLatestWeightEntry } from "../../db/weightRepo";
+import { buildWeightSeries } from "../../domain/weightSeries";
+import { todayISO, addDays } from "../../utils/date";
 import type { WeightEntry, WeightGoal } from "../../db/schema";
 
 export function WeightPage() {
   const [goal, setGoal] = useState<WeightGoal | null>(null);
+  const [entries, setEntries] = useState<WeightEntry[]>([]);
   const [latestEntry, setLatestEntry] = useState<WeightEntry | null>(null);
   const [showGoalForm, setShowGoalForm] = useState(false);
   const [loading, setLoading] = useState(true);
 
   async function refresh() {
-    const [g, w] = await Promise.all([getActiveGoal(), getLatestWeightEntry()]);
+    const [g, all, latest] = await Promise.all([
+      getActiveGoal(),
+      getAllWeightEntries(),
+      getLatestWeightEntry(),
+    ]);
     setGoal(g);
-    setLatestEntry(w);
+    setEntries(all);
+    setLatestEntry(latest);
     setLoading(false);
     return g;
   }
@@ -36,6 +45,10 @@ export function WeightPage() {
       </PageLayout>
     );
   }
+
+  const windowStart = addDays(todayISO(), -15);
+  const windowEnd = addDays(todayISO(), 15);
+  const series = buildWeightSeries(entries, goal, windowStart, windowEnd);
 
   return (
     <PageLayout
@@ -78,17 +91,7 @@ export function WeightPage() {
 
       <QuickWeightEntry onSaved={refresh} />
 
-      <div
-        style={{
-          padding: "var(--space-m)",
-          borderRadius: "var(--radius-m)",
-          background: "var(--color-teal-soft)",
-          fontSize: "13px",
-          color: "var(--color-depth)",
-        }}
-      >
-        Le graphique d'évolution arrive à l'étape suivante.
-      </div>
+      <WeightChart series={series} hasGoal={goal !== null} />
     </PageLayout>
   );
 }
