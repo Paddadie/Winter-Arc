@@ -1,59 +1,20 @@
-import { useEffect, useState } from "react";
 import { Card } from "../../components/Card";
+import { BottomSheet } from "../../components/BottomSheet";
 import type { WeightSeriesPoint } from "../../domain/weightSeries";
-
-const TRANSITION_MS = 220;
 
 interface DayDetailCardProps {
   point: WeightSeriesPoint;
   onClose: () => void;
 }
 
-/**
- * Fiche détail d'un jour, affichée en fiche du bas au tap sur le graphique.
- * Reste montée pendant l'animation de sortie (visible=false) avant de
- * prévenir le parent via onClose, pour que la fermeture soit aussi fluide
- * que l'ouverture (sinon le composant disparaît instantanément au clic).
- */
+/** Fiche détail d'un jour, affichée en fiche du bas au tap sur le graphique. */
 export function DayDetailCard({ point, onClose }: DayDetailCardProps) {
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const raf = requestAnimationFrame(() => setVisible(true));
-    return () => cancelAnimationFrame(raf);
-  }, []);
-
-  function handleClose() {
-    setVisible(false);
-    setTimeout(onClose, TRANSITION_MS);
-  }
-
   const diff =
     point.weightKg !== null && point.goalWeightKg !== null ? Math.round((point.weightKg - point.goalWeightKg) * 10) / 10 : null;
 
   return (
-    <div
-      onClick={handleClose}
-      style={{
-        position: "fixed",
-        inset: 0,
-        background: visible ? "rgba(15, 32, 39, 0.4)" : "rgba(15, 32, 39, 0)",
-        transition: `background ${TRANSITION_MS}ms ease-out`,
-        display: "flex",
-        alignItems: "flex-end",
-        justifyContent: "center",
-        zIndex: 50,
-      }}
-    >
-      <div
-        onClick={(e) => e.stopPropagation()}
-        style={{
-          width: "100%",
-          maxWidth: "480px",
-          transform: visible ? "translateY(0)" : "translateY(100%)",
-          transition: `transform ${TRANSITION_MS}ms ease-out`,
-        }}
-      >
+    <BottomSheet onClose={onClose}>
+      {(close) => (
         <Card
           style={{
             borderRadius: "var(--radius-l) var(--radius-l) 0 0",
@@ -72,7 +33,7 @@ export function DayDetailCard({ point, onClose }: DayDetailCardProps) {
               {formatFullDate(point.date)}
             </p>
             <button
-              onClick={handleClose}
+              onClick={close}
               aria-label="Fermer"
               style={{
                 border: "none",
@@ -114,8 +75,8 @@ export function DayDetailCard({ point, onClose }: DayDetailCardProps) {
             color={point.foodDeviation ? "var(--color-alert)" : undefined}
           />
         </Card>
-      </div>
-    </div>
+      )}
+    </BottomSheet>
   );
 }
 
