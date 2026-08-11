@@ -6,13 +6,24 @@ interface PageLayoutProps {
   accentColor: string;
   children: ReactNode;
   headerAction?: ReactNode;
+  /** Cible du bouton retour. Par défaut "/" (accueil) pour les pages de premier niveau. */
+  backTo?: string;
+  /** Libellé du bouton retour. Par défaut "Accueil". */
+  backLabel?: string;
 }
 
 /**
  * Layout commun à toutes les pages fonctionnelles (hors accueil).
  * Fournit le bouton retour et un en-tête cohérent.
  */
-export function PageLayout({ title, accentColor, children, headerAction }: PageLayoutProps) {
+export function PageLayout({
+  title,
+  accentColor,
+  children,
+  headerAction,
+  backTo = "/",
+  backLabel = "Accueil",
+}: PageLayoutProps) {
   const navigate = useNavigate();
 
   return (
@@ -31,8 +42,8 @@ export function PageLayout({ title, accentColor, children, headerAction }: PageL
         }}
       >
         <button
-          onClick={() => navigate("/")}
-          aria-label="Retour à l'accueil"
+          onClick={() => navigate(backTo)}
+          aria-label={`Retour${backLabel === "Accueil" ? " à l'accueil" : ` à ${backLabel}`}`}
           style={{
             display: "flex",
             alignItems: "center",
@@ -46,7 +57,7 @@ export function PageLayout({ title, accentColor, children, headerAction }: PageL
           }}
         >
           <span style={{ fontSize: "20px", lineHeight: 1 }}>‹</span>
-          Accueil
+          {backLabel}
         </button>
         {headerAction}
       </header>

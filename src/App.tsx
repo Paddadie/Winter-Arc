@@ -1,6 +1,7 @@
 import { HashRouter, Routes, Route } from "react-router-dom";
 import { HomePage } from "./features/home/HomePage";
 import { WeightPage } from "./features/weight/WeightPage";
+import { WeightHistoryPage } from "./features/weight/WeightHistoryPage";
 import { ApneaPage } from "./features/apnea/ApneaPage";
 import { DebugPage } from "./features/debug/DebugPage";
 
@@ -15,6 +16,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/regime" element={<WeightPage />} />
+        <Route path="/regime/historique" element={<WeightHistoryPage />} />
         <Route path="/apnee" element={<ApneaPage />} />
         <Route path="/debug" element={<DebugPage />} />
       </Routes>
