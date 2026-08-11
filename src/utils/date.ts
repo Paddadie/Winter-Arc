@@ -19,6 +19,14 @@ export function addDays(isoDate: string, days: number): string {
   return toISODate(date);
 }
 
+/** Heure actuelle au format "HH:MM", en heure locale. */
+export function nowTimeHHMM(): string {
+  const now = new Date();
+  const hours = String(now.getHours()).padStart(2, "0");
+  const minutes = String(now.getMinutes()).padStart(2, "0");
+  return `${hours}:${minutes}`;
+}
+
 /** Nombre de jours entre deux dates ISO (b - a). */
 export function daysBetween(a: string, b: string): number {
   const [ay, am, ad] = a.split("-").map(Number);
