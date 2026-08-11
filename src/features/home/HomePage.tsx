@@ -1,42 +1,16 @@
 import { featureTiles } from "./features.config";
 import { Tile } from "./Tile";
+import "./HomePage.css";
 
 export function HomePage() {
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        minHeight: "100dvh",
-        padding: "var(--space-l)",
-        paddingTop: "calc(var(--space-xl) + env(safe-area-inset-top))",
-        gap: "var(--space-xl)",
-      }}
-    >
+    <div className="home-page">
       <div>
-        <p
-          style={{
-            margin: 0,
-            fontSize: "15px",
-            color: "var(--color-ink-muted)",
-            fontWeight: 500,
-          }}
-        >
-          Suivi personnel
-        </p>
-        <h1
-          style={{
-            fontFamily: "var(--font-display)",
-            fontSize: "34px",
-            fontWeight: 800,
-            margin: "4px 0 0 0",
-          }}
-        >
-          Tableau de bord
-        </h1>
+        <p className="home-eyebrow">Suivi personnel</p>
+        <h1 className="home-title">Tableau de bord</h1>
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-m)" }}>
+      <div className="home-tiles">
         {featureTiles.map((tile) => (
           <Tile key={tile.id} tile={tile} />
         ))}

@@ -4,6 +4,7 @@ import { Card } from "../../components/Card";
 import { CardLabel } from "../../components/CardLabel";
 import { exportAllData, importAllData, isValidBackupData, type BackupData } from "../../db/backupRepo";
 import { todayISO } from "../../utils/date";
+import "./SettingsPage.css";
 
 export function SettingsPage() {
   const [exportFeedback, setExportFeedback] = useState(false);
@@ -73,37 +74,21 @@ export function SettingsPage() {
     <PageLayout title="Réglages" accentColor="var(--color-ink)">
       <Card>
         <CardLabel>Sauvegarde</CardLabel>
-        <p style={{ margin: "0 0 var(--space-m) 0", fontSize: "14px", color: "var(--color-ink-muted)" }}>
+        <p className="settings-description">
           Aucune synchronisation automatique — exporte régulièrement tes données dans un fichier, à conserver où tu
           veux (mail, cloud personnel...).
         </p>
 
-        <button
-          onClick={handleExport}
-          style={{
-            width: "100%",
-            border: "none",
-            borderRadius: "var(--radius-m)",
-            padding: "14px",
-            background: "var(--color-ink)",
-            color: "white",
-            fontSize: "16px",
-            fontWeight: 700,
-          }}
-        >
+        <button onClick={handleExport} className="settings-button settings-button--filled">
           Exporter mes données (JSON)
         </button>
-        {exportFeedback && (
-          <p style={{ margin: "8px 0 0 0", fontSize: "13px", color: "var(--color-success)", fontWeight: 600 }}>
-            ✓ Fichier téléchargé
-          </p>
-        )}
-        <a ref={downloadLinkRef} style={{ display: "none" }} />
+        {exportFeedback && <p className="settings-feedback">✓ Fichier téléchargé</p>}
+        <a ref={downloadLinkRef} className="settings-hidden" />
       </Card>
 
       <Card>
         <CardLabel>Restauration</CardLabel>
-        <p style={{ margin: "0 0 var(--space-m) 0", fontSize: "14px", color: "var(--color-ink-muted)" }}>
+        <p className="settings-description">
           Importer un fichier remplace entièrement les données actuelles de l'appareil par celles du fichier.
         </p>
 
@@ -112,28 +97,16 @@ export function SettingsPage() {
           type="file"
           accept="application/json"
           onChange={handleFileSelected}
-          style={{ display: "none" }}
+          className="settings-hidden"
         />
         <button
           onClick={handleImportClick}
           disabled={importing}
-          style={{
-            width: "100%",
-            border: "1.5px solid var(--color-ink)",
-            borderRadius: "var(--radius-m)",
-            padding: "14px",
-            background: "transparent",
-            color: "var(--color-ink)",
-            fontSize: "16px",
-            fontWeight: 700,
-            opacity: importing ? 0.5 : 1,
-          }}
+          className="settings-button settings-button--outline"
         >
           {importing ? "Import en cours…" : "Importer un fichier JSON"}
         </button>
-        {importError && (
-          <p style={{ margin: "8px 0 0 0", fontSize: "13px", color: "var(--color-alert)" }}>{importError}</p>
-        )}
+        {importError && <p className="settings-error">{importError}</p>}
       </Card>
     </PageLayout>
   );

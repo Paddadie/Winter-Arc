@@ -1,4 +1,5 @@
 import { useRegisterSW } from "virtual:pwa-register/react";
+import "./UpdatePrompt.css";
 
 /**
  * Bandeau "Mettre à jour" affiché quand une nouvelle version de l'app est
@@ -18,51 +19,13 @@ export function UpdatePrompt() {
   if (!needRefresh) return null;
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        left: 0,
-        right: 0,
-        bottom: 0,
-        zIndex: 100,
-        background: "var(--color-ink)",
-        color: "white",
-        padding: "var(--space-m) var(--space-l)",
-        paddingBottom: "calc(var(--space-m) + env(safe-area-inset-bottom))",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        gap: "var(--space-m)",
-        boxShadow: "0 -2px 12px rgba(15, 32, 39, 0.25)",
-      }}
-    >
-      <span style={{ fontSize: "14px", fontWeight: 600 }}>Nouvelle version disponible</span>
-      <div style={{ display: "flex", gap: "var(--space-s)", flexShrink: 0 }}>
-        <button
-          onClick={() => setNeedRefresh(false)}
-          style={{
-            border: "none",
-            background: "transparent",
-            color: "rgba(255, 255, 255, 0.7)",
-            fontSize: "14px",
-            fontWeight: 600,
-            padding: "8px",
-          }}
-        >
+    <div className="update-prompt">
+      <span className="update-prompt-text">Nouvelle version disponible</span>
+      <div className="update-prompt-actions">
+        <button onClick={() => setNeedRefresh(false)} className="update-prompt-dismiss">
           Plus tard
         </button>
-        <button
-          onClick={() => updateServiceWorker(true)}
-          style={{
-            border: "none",
-            borderRadius: "var(--radius-m)",
-            background: "white",
-            color: "var(--color-ink)",
-            fontSize: "14px",
-            fontWeight: 700,
-            padding: "8px 16px",
-          }}
-        >
+        <button onClick={() => updateServiceWorker(true)} className="update-prompt-confirm">
           Mettre à jour
         </button>
       </div>
