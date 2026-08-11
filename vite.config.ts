@@ -14,8 +14,8 @@ export default defineConfig({
       injectRegister: false, // enregistrement fait à la main via useRegisterSW (bandeau custom)
       includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
       manifest: {
-        name: 'Suivi personnel',
-        short_name: 'Suivi',
+        name: 'Winter Arc',
+        short_name: 'Winter',
         description: 'Suivi de régime et d’apnée',
         theme_color: '#123542',
         background_color: '#F5F7F7',

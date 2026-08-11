@@ -5,7 +5,6 @@ import { WeightHistoryPage } from "./features/weight/WeightHistoryPage";
 import { ApneaPage } from "./features/apnea/ApneaPage";
 import { ApneaHistoryPage } from "./features/apnea/ApneaHistoryPage";
 import { SettingsPage } from "./features/settings/SettingsPage";
-import { DebugPage } from "./features/debug/DebugPage";
 import { UpdatePrompt } from "./components/UpdatePrompt";
 
 /**
@@ -23,7 +22,6 @@ export default function App() {
         <Route path="/apnee" element={<ApneaPage />} />
         <Route path="/apnee/historique" element={<ApneaHistoryPage />} />
         <Route path="/reglages" element={<SettingsPage />} />
-        <Route path="/debug" element={<DebugPage />} />
       </Routes>
       <UpdatePrompt />
     </HashRouter>

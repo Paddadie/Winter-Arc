@@ -6,7 +6,7 @@ export function HomePage() {
   return (
     <div className="home-page">
       <div>
-        <p className="home-eyebrow">Suivi personnel</p>
+        <p className="home-eyebrow">Winter Arc</p>
         <h1 className="home-title">Tableau de bord</h1>
       </div>
 
