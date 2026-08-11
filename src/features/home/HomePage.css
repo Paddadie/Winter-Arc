@@ -7,6 +7,26 @@
   gap: var(--space-xl);
 }
 
+.home-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.home-settings-button {
+  border: none;
+  background: var(--color-border);
+  color: var(--color-ink-muted);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
 .home-eyebrow {
   margin: 0;
   font-size: 15px;

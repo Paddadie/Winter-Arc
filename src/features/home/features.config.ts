@@ -34,13 +34,4 @@ export const featureTiles: FeatureTile[] = [
     color: "var(--color-teal)",
     colorSoft: "var(--color-teal-soft)",
   },
-  {
-    id: "settings",
-    label: "Réglages",
-    description: "Export et import des données",
-    route: "/reglages",
-    icon: "⚙️",
-    color: "var(--color-ink-muted)",
-    colorSoft: "var(--color-border)",
-  },
 ];
