@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { PageLayout } from "../../components/PageLayout";
 import { Card } from "../../components/Card";
 import { BottomSheet } from "../../components/BottomSheet";
@@ -340,6 +341,7 @@ function whenLabel(iso: string): string {
  * des jours de la fenêtre n'a de mesure, un message l'indique clairement.
  */
 function RecentPerformancesCard({ sessions }: { sessions: ApneaSession[] }) {
+  const navigate = useNavigate();
   const lookbackDates = Array.from({ length: RECENT_LOOKBACK_DAYS - 1 }, (_, i) => addDays(todayISO(), -(i + 1)));
   const datesWithData = lookbackDates.filter((date) => sessions.some((s) => s.date === date));
   const shownDates = datesWithData.slice(0, RECENT_DAYS_SHOWN);
@@ -385,6 +387,21 @@ function RecentPerformancesCard({ sessions }: { sessions: ApneaSession[] }) {
           })}
         </div>
       )}
+
+      <button
+        onClick={() => navigate("/apnee/historique")}
+        style={{
+          border: "none",
+          background: "transparent",
+          color: "var(--color-teal)",
+          fontSize: "13px",
+          fontWeight: 600,
+          padding: 0,
+          marginTop: "var(--space-s)",
+        }}
+      >
+        Historique complet →
+      </button>
     </Card>
   );
 }

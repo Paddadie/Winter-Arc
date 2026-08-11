@@ -3,6 +3,7 @@ import { HomePage } from "./features/home/HomePage";
 import { WeightPage } from "./features/weight/WeightPage";
 import { WeightHistoryPage } from "./features/weight/WeightHistoryPage";
 import { ApneaPage } from "./features/apnea/ApneaPage";
+import { ApneaHistoryPage } from "./features/apnea/ApneaHistoryPage";
 import { DebugPage } from "./features/debug/DebugPage";
 
 /**
@@ -18,6 +19,7 @@ export default function App() {
         <Route path="/regime" element={<WeightPage />} />
         <Route path="/regime/historique" element={<WeightHistoryPage />} />
         <Route path="/apnee" element={<ApneaPage />} />
+        <Route path="/apnee/historique" element={<ApneaHistoryPage />} />
         <Route path="/debug" element={<DebugPage />} />
       </Routes>
     </HashRouter>

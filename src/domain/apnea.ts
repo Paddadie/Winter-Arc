@@ -22,6 +22,32 @@ export function averageDuration(durationsSec: number[]): number | null {
   return Math.round(total / durationsSec.length);
 }
 
+export interface ApneaDailyPoint {
+  date: string;
+  durationSec: number;
+  count: number;
+}
+
+/**
+ * Regroupe des sessions par jour et calcule la moyenne de chaque jour, pour
+ * un graphique de progression lisible (un point par jour plutôt qu'un point
+ * par mesure). `sessions` doit être trié par date croissante en entrée : les
+ * jours ressortent alors dans le même ordre, sans tri supplémentaire.
+ */
+export function groupDailyAverages(sessions: ApneaSession[]): ApneaDailyPoint[] {
+  const byDate = new Map<string, number[]>();
+  for (const s of sessions) {
+    const durations = byDate.get(s.date) ?? [];
+    durations.push(s.durationSec);
+    byDate.set(s.date, durations);
+  }
+  return [...byDate.entries()].map(([date, durations]) => ({
+    date,
+    durationSec: averageDuration(durations)!,
+    count: durations.length,
+  }));
+}
+
 export interface ApneaWindowStats {
   averageSec: number;
   worst: { durationSec: number; date: string };
