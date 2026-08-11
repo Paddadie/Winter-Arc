@@ -3,6 +3,8 @@ import { Card } from "../../components/Card";
 import { CardLabel } from "../../components/CardLabel";
 import { formatDuration } from "../../domain/apnea";
 import type { ApneaDailyPoint } from "../../domain/apnea";
+import "../../components/chartTooltip.css";
+import "./ApneaProgressionChart.css";
 
 interface ApneaProgressionChartProps {
   /** Un point par jour (moyenne des mesures de ce jour), trié par date croissante. */
@@ -16,15 +18,13 @@ interface ApneaProgressionChartProps {
  */
 export function ApneaProgressionChart({ points }: ApneaProgressionChartProps) {
   return (
-    <Card style={{ padding: "var(--space-m) var(--space-s)" }}>
-      <CardLabel style={{ margin: "0 var(--space-m) var(--space-s) var(--space-m)" }}>Progression</CardLabel>
+    <Card className="card--flat">
+      <CardLabel className="card-label--chart">Progression</CardLabel>
 
       {points.length === 0 ? (
-        <p style={{ margin: "var(--space-l) var(--space-m)", color: "var(--color-ink-muted)", fontSize: "14px" }}>
-          Aucune mesure sur cette période.
-        </p>
+        <p className="apnea-progression-empty">Aucune mesure sur cette période.</p>
       ) : (
-        <div style={{ width: "100%", height: 200 }}>
+        <div className="apnea-progression-canvas">
           <ResponsiveContainer>
             <ComposedChart data={points} margin={{ top: 8, right: 16, bottom: 0, left: 0 }}>
               <CartesianGrid stroke="var(--color-border)" vertical={false} />
@@ -74,16 +74,8 @@ function ProgressionTooltip({
   if (!active || !payload || payload.length === 0) return null;
   const point = payload[0].payload;
   return (
-    <div
-      style={{
-        background: "var(--color-depth)",
-        color: "white",
-        borderRadius: "10px",
-        padding: "8px 12px",
-        fontSize: "12px",
-      }}
-    >
-      <div style={{ fontWeight: 700, marginBottom: "2px" }}>{formatTick(point.date)}</div>
+    <div className="chart-tooltip">
+      <div className="chart-tooltip-title">{formatTick(point.date)}</div>
       <div>
         {formatDuration(point.durationSec)}
         {point.count > 1 ? ` (moyenne de ${point.count} mesures)` : ""}

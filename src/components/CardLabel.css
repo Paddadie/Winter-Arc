@@ -14,3 +14,7 @@
 .card-label--chart {
   margin: 0 var(--space-m) var(--space-s) var(--space-m);
 }
+
+.card-label--left {
+  text-align: left;
+}

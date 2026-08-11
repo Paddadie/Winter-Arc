@@ -6,6 +6,7 @@ import { deleteApneaSession, getAllApneaSessions } from "../../db/apneaRepo";
 import { formatDuration, groupDailyAverages } from "../../domain/apnea";
 import { todayISO, addDays, relativeDayLabel } from "../../utils/date";
 import type { ApneaSession } from "../../db/schema";
+import "./ApneaHistoryPage.css";
 
 type Period = "7j" | "30j" | "tout";
 
@@ -41,7 +42,7 @@ export function ApneaHistoryPage() {
   if (loading) {
     return (
       <PageLayout title="Historique" accentColor="var(--color-teal)" backTo="/apnee" backLabel="Apnée">
-        <p style={{ color: "var(--color-ink-muted)" }}>Chargement…</p>
+        <p className="apnea-history-loading">Chargement…</p>
       </PageLayout>
     );
   }
@@ -54,21 +55,12 @@ export function ApneaHistoryPage() {
 
   return (
     <PageLayout title="Historique" accentColor="var(--color-teal)" backTo="/apnee" backLabel="Apnée">
-      <div style={{ display: "flex", gap: "var(--space-s)" }}>
+      <div className="apnea-history-period-row">
         {PERIOD_OPTIONS.map((opt) => (
           <button
             key={opt.value}
             onClick={() => setPeriod(opt.value)}
-            style={{
-              flex: 1,
-              border: `1.5px solid ${period === opt.value ? "var(--color-teal)" : "var(--color-border)"}`,
-              borderRadius: "var(--radius-m)",
-              padding: "8px",
-              background: period === opt.value ? "var(--color-teal)" : "transparent",
-              color: period === opt.value ? "white" : "var(--color-ink)",
-              fontSize: "14px",
-              fontWeight: 600,
-            }}
+            className={`period-button ${period === opt.value ? "period-button--active" : ""}`}
           >
             {opt.label}
           </button>
@@ -77,41 +69,20 @@ export function ApneaHistoryPage() {
 
       <ApneaProgressionChart points={dailyPoints} />
 
-      <Card style={{ padding: "var(--space-s) var(--space-m)" }}>
+      <Card className="apnea-history-table-card">
         {filtered.length === 0 ? (
-          <p style={{ margin: "var(--space-s) 0", color: "var(--color-ink-muted)", fontSize: "14px" }}>
-            Aucune mesure sur cette période.
-          </p>
+          <p className="apnea-history-empty">Aucune mesure sur cette période.</p>
         ) : (
           <div>
             {filtered.map((session, i) => (
-              <div
-                key={session.id}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "var(--space-s)",
-                  padding: "10px 0",
-                  borderTop: i === 0 ? "none" : "1px solid var(--color-border)",
-                }}
-              >
-                <span style={{ flex: 1, fontSize: "14px" }}>{relativeDayLabel(session.date)}</span>
-                <span style={{ width: "48px", fontSize: "14px", color: "var(--color-ink-muted)" }}>
-                  {session.time ?? "—"}
-                </span>
-                <span style={{ width: "56px", fontSize: "14px", fontWeight: 600, textAlign: "right" }}>
-                  {formatDuration(session.durationSec)}
-                </span>
+              <div key={session.id} className={`apnea-history-row ${i === 0 ? "apnea-history-row--first" : ""}`}>
+                <span className="apnea-history-date">{relativeDayLabel(session.date)}</span>
+                <span className="apnea-history-time">{session.time ?? "—"}</span>
+                <span className="apnea-history-duration">{formatDuration(session.durationSec)}</span>
                 <button
                   onClick={() => handleDelete(session)}
                   aria-label="Supprimer cette mesure"
-                  style={{
-                    border: "none",
-                    background: "transparent",
-                    color: "var(--color-ink-muted)",
-                    fontSize: "16px",
-                    padding: "4px 0 4px 8px",
-                  }}
+                  className="apnea-history-delete-button"
                 >
                   🗑
                 </button>

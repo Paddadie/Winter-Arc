@@ -1,0 +1,258 @@
+.apnea-empty-message {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-ink-muted);
+}
+
+.apnea-timer-display {
+  font-family: var(--font-display);
+  font-size: 48px;
+  font-weight: 800;
+  margin: 0;
+  line-height: 1;
+  color: var(--color-depth);
+  font-variant-numeric: tabular-nums;
+}
+
+.apnea-timer-display--running {
+  color: var(--color-teal);
+}
+
+.apnea-timer-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-s);
+  margin-top: var(--space-l);
+}
+
+.timer-button {
+  border-radius: var(--radius-m);
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.timer-button--full-width {
+  grid-column: 1 / -1;
+}
+
+.timer-button--filled {
+  border: none;
+  color: white;
+}
+
+.timer-button--outline {
+  background: transparent;
+}
+
+.timer-button--teal.timer-button--filled {
+  background: var(--color-teal);
+}
+
+.timer-button--alert.timer-button--filled {
+  background: var(--color-alert);
+}
+
+.timer-button--depth.timer-button--filled {
+  background: var(--color-depth);
+}
+
+.timer-button--muted.timer-button--outline {
+  border: 1.5px solid var(--color-ink-muted);
+  color: var(--color-ink-muted);
+}
+
+.timer-button:disabled {
+  opacity: 0.4;
+}
+
+.apnea-feedback {
+  margin: var(--space-s) 0 0 0;
+  font-size: 13px;
+  color: var(--color-success);
+  font-weight: 600;
+}
+
+.apnea-error {
+  margin: var(--space-s) 0 0 0;
+  font-size: 13px;
+  color: var(--color-alert);
+}
+
+.apnea-today-average {
+  margin: 0 0 var(--space-s) 0;
+  font-size: 14px;
+}
+
+.apnea-today-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.apnea-today-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  padding: 4px 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.apnea-today-time {
+  color: var(--color-ink-muted);
+}
+
+.apnea-today-duration {
+  font-weight: 600;
+}
+
+.apnea-stats-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.apnea-info-button {
+  border: 1.5px solid var(--color-ink-muted);
+  background: transparent;
+  color: var(--color-ink-muted);
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 0;
+  margin-bottom: var(--space-s);
+}
+
+.apnea-stats-empty {
+  text-align: left;
+}
+
+.apnea-stats-average {
+  font-family: var(--font-display);
+  font-size: 40px;
+  font-weight: 800;
+  margin: 0;
+  line-height: 1;
+  color: var(--color-depth);
+}
+
+.apnea-stats-average-label {
+  margin: 2px 0 0 0;
+  font-size: 13px;
+  color: var(--color-ink-muted);
+}
+
+.apnea-stats-row {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-xl);
+  margin-top: var(--space-m);
+  padding-top: var(--space-m);
+  border-top: 1px solid var(--color-border);
+}
+
+.apnea-stats-value {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.apnea-stats-value--alert {
+  color: var(--color-alert);
+}
+
+.apnea-stats-value--success {
+  color: var(--color-success);
+}
+
+.apnea-stats-sublabel {
+  margin: 2px 0 0 0;
+  font-size: 12px;
+  color: var(--color-ink-muted);
+}
+
+.apnea-info-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-s);
+}
+
+.apnea-info-title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.apnea-info-close-button {
+  border: none;
+  background: var(--color-surface);
+  color: var(--color-ink-muted);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 15px;
+}
+
+.apnea-info-text {
+  margin: 0 0 4px 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.apnea-info-strong--alert {
+  color: var(--color-alert);
+}
+
+.apnea-info-strong--success {
+  color: var(--color-success);
+}
+
+.apnea-info-detail {
+  margin: 0 0 var(--space-m) 0;
+  font-size: 13px;
+  color: var(--color-ink-muted);
+}
+
+.apnea-info-detail:last-child {
+  margin-bottom: 0;
+}
+
+.apnea-info-detail-value {
+  color: var(--color-ink);
+}
+
+.apnea-recent-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.apnea-recent-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  padding: 6px 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.apnea-recent-row--first {
+  border-top: none;
+}
+
+.apnea-recent-duration {
+  font-weight: 600;
+}
+
+.apnea-history-link {
+  border: none;
+  background: transparent;
+  color: var(--color-teal);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 0;
+  margin-top: var(--space-s);
+}

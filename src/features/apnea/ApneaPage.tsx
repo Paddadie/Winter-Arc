@@ -9,6 +9,7 @@ import { formatDuration, formatDurationWithMs, averageDuration, computeWindowSta
 import type { ApneaWindowStats } from "../../domain/apnea";
 import { todayISO, addDays, nowTimeHHMM, relativeDayLabel } from "../../utils/date";
 import type { ApneaSession } from "../../db/schema";
+import "./ApneaPage.css";
 
 const STATS_WINDOW_DAYS = 10;
 const RECENT_LOOKBACK_DAYS = 8;
@@ -89,71 +90,44 @@ export function ApneaPage() {
     <PageLayout title="Apnée" accentColor="var(--color-teal)">
       <WindowStatsCard stats={windowStats} />
 
-      <Card style={{ textAlign: "center" }}>
-        <p
-          style={{
-            fontFamily: "var(--font-display)",
-            fontSize: "48px",
-            fontWeight: 800,
-            margin: 0,
-            lineHeight: 1,
-            color: isRunning ? "var(--color-teal)" : "var(--color-depth)",
-            fontVariantNumeric: "tabular-nums",
-          }}
-        >
+      <Card className="card--center">
+        <p className={`apnea-timer-display ${isRunning ? "apnea-timer-display--running" : ""}`}>
           {formatDurationWithMs(currentElapsedMs)}
         </p>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-s)", marginTop: "var(--space-l)" }}>
+        <div className="apnea-timer-buttons">
           <TimerButton
             label={isRunning ? "Stop" : "Start"}
             onClick={handleToggleRun}
             variant="filled"
-            color={isRunning ? "var(--color-alert)" : "var(--color-teal)"}
+            tone={isRunning ? "alert" : "teal"}
             fullWidth
           />
-          <TimerButton label="Reset" onClick={handleReset} variant="outline" color="var(--color-ink-muted)" />
-          <TimerButton label="Enregistrer" onClick={handleSave} variant="filled" color="var(--color-depth)" disabled={isRunning} />
+          <TimerButton label="Reset" onClick={handleReset} variant="outline" tone="muted" />
+          <TimerButton label="Enregistrer" onClick={handleSave} variant="filled" tone="depth" disabled={isRunning} />
         </div>
 
-        {savedFeedback && (
-          <p style={{ margin: "var(--space-s) 0 0 0", fontSize: "13px", color: "var(--color-success)", fontWeight: 600 }}>
-            ✓ Enregistré
-          </p>
-        )}
-        {saveError && (
-          <p style={{ margin: "var(--space-s) 0 0 0", fontSize: "13px", color: "var(--color-alert)" }}>{saveError}</p>
-        )}
+        {savedFeedback && <p className="apnea-feedback">✓ Enregistré</p>}
+        {saveError && <p className="apnea-error">{saveError}</p>}
       </Card>
 
       <Card>
         <CardLabel>Aujourd'hui</CardLabel>
 
         {todaySessions.length === 0 ? (
-          <p style={{ margin: 0, fontSize: "14px", color: "var(--color-ink-muted)" }}>
-            Aucune mesure enregistrée aujourd'hui.
-          </p>
+          <p className="apnea-empty-message">Aucune mesure enregistrée aujourd'hui.</p>
         ) : (
           <>
             {todayAverage !== null && todaySessions.length > 1 && (
-              <p style={{ margin: "0 0 var(--space-s) 0", fontSize: "14px" }}>
+              <p className="apnea-today-average">
                 Moyenne du jour : <strong>{formatDuration(todayAverage)}</strong>
               </p>
             )}
-            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+            <div className="apnea-today-list">
               {todaySessions.map((session) => (
-                <div
-                  key={session.id}
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    fontSize: "14px",
-                    padding: "4px 0",
-                    borderTop: "1px solid var(--color-border)",
-                  }}
-                >
-                  <span style={{ color: "var(--color-ink-muted)" }}>{session.time ?? "—"}</span>
-                  <span style={{ fontWeight: 600 }}>{formatDuration(session.durationSec)}</span>
+                <div key={session.id} className="apnea-today-row">
+                  <span className="apnea-today-time">{session.time ?? "—"}</span>
+                  <span className="apnea-today-duration">{formatDuration(session.durationSec)}</span>
                 </div>
               ))}
             </div>
@@ -171,26 +145,10 @@ function WindowStatsCard({ stats }: { stats: ApneaWindowStats | null }) {
   const [showInfo, setShowInfo] = useState(false);
 
   return (
-    <Card style={{ textAlign: "center" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <CardLabel style={{ textAlign: "left" }}>{STATS_WINDOW_DAYS} derniers jours</CardLabel>
-        <button
-          onClick={() => setShowInfo(true)}
-          aria-label="En savoir plus sur ces statistiques"
-          style={{
-            border: "1.5px solid var(--color-ink-muted)",
-            background: "transparent",
-            color: "var(--color-ink-muted)",
-            width: "22px",
-            height: "22px",
-            borderRadius: "50%",
-            fontSize: "12px",
-            fontWeight: 700,
-            lineHeight: 1,
-            padding: 0,
-            marginBottom: "var(--space-s)",
-          }}
-        >
+    <Card className="card--center">
+      <div className="apnea-stats-header">
+        <CardLabel className="card-label--left">{STATS_WINDOW_DAYS} derniers jours</CardLabel>
+        <button onClick={() => setShowInfo(true)} aria-label="En savoir plus sur ces statistiques" className="apnea-info-button">
           i
         </button>
       </div>
@@ -198,46 +156,24 @@ function WindowStatsCard({ stats }: { stats: ApneaWindowStats | null }) {
       {showInfo && <WindowStatsInfoSheet stats={stats} onClose={() => setShowInfo(false)} />}
 
       {stats === null ? (
-        <p style={{ margin: 0, fontSize: "14px", color: "var(--color-ink-muted)", textAlign: "left" }}>
-          Pas assez de données sur les {STATS_WINDOW_DAYS} derniers jours.
-        </p>
+        <p className="apnea-empty-message apnea-stats-empty">Pas assez de données sur les {STATS_WINDOW_DAYS} derniers jours.</p>
       ) : (
         <>
-          <p
-            style={{
-              fontFamily: "var(--font-display)",
-              fontSize: "40px",
-              fontWeight: 800,
-              margin: 0,
-              lineHeight: 1,
-              color: "var(--color-depth)",
-            }}
-          >
-            {formatDuration(stats.averageSec)}
-          </p>
-          <p style={{ margin: "2px 0 0 0", fontSize: "13px", color: "var(--color-ink-muted)" }}>temps moyen</p>
+          <p className="apnea-stats-average">{formatDuration(stats.averageSec)}</p>
+          <p className="apnea-stats-average-label">temps moyen</p>
 
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              gap: "var(--space-xl)",
-              marginTop: "var(--space-m)",
-              paddingTop: "var(--space-m)",
-              borderTop: "1px solid var(--color-border)",
-            }}
-          >
+          <div className="apnea-stats-row">
             <div>
-              <p style={{ margin: 0, fontSize: "18px", fontWeight: 700, color: "var(--color-alert)" }}>
+              <p className="apnea-stats-value apnea-stats-value--alert">
                 +{formatDuration(stats.averageSec - stats.worst.durationSec)}
               </p>
-              <p style={{ margin: "2px 0 0 0", fontSize: "12px", color: "var(--color-ink-muted)" }}>pire perf.</p>
+              <p className="apnea-stats-sublabel">pire perf.</p>
             </div>
             <div>
-              <p style={{ margin: 0, fontSize: "18px", fontWeight: 700, color: "var(--color-success)" }}>
+              <p className="apnea-stats-value apnea-stats-value--success">
                 -{formatDuration(stats.best.durationSec - stats.averageSec)}
               </p>
-              <p style={{ margin: "2px 0 0 0", fontSize: "12px", color: "var(--color-ink-muted)" }}>meilleure perf.</p>
+              <p className="apnea-stats-sublabel">meilleure perf.</p>
             </div>
           </div>
         </>
@@ -250,53 +186,35 @@ function WindowStatsInfoSheet({ stats, onClose }: { stats: ApneaWindowStats | nu
   return (
     <BottomSheet onClose={onClose}>
       {(close) => (
-        <Card
-          style={{
-            borderRadius: "var(--radius-l) var(--radius-l) 0 0",
-            textAlign: "left",
-            paddingBottom: "calc(var(--space-l) + env(safe-area-inset-bottom))",
-          }}
-        >
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--space-s)" }}>
-            <p style={{ margin: 0, fontSize: "17px", fontWeight: 700 }}>Pire / meilleure performance</p>
-            <button
-              onClick={close}
-              aria-label="Fermer"
-              style={{
-                border: "none",
-                background: "var(--color-surface)",
-                color: "var(--color-ink-muted)",
-                width: "32px",
-                height: "32px",
-                borderRadius: "50%",
-                fontSize: "15px",
-              }}
-            >
+        <Card className="card--sheet">
+          <div className="apnea-info-header">
+            <p className="apnea-info-title">Pire / meilleure performance</p>
+            <button onClick={close} aria-label="Fermer" className="apnea-info-close-button">
               ✕
             </button>
           </div>
 
-          <p style={{ margin: "0 0 4px 0", fontSize: "14px", lineHeight: 1.5 }}>
-            <strong style={{ color: "var(--color-alert)" }}>Pire perf.</strong> : l'écart entre ta mesure la plus
+          <p className="apnea-info-text">
+            <strong className="apnea-info-strong--alert">Pire perf.</strong> : l'écart entre ta mesure la plus
             courte et ta moyenne sur les {STATS_WINDOW_DAYS} derniers jours. Plus ce nombre est petit, plus tes
             performances sont régulières.
           </p>
           {stats && (
-            <p style={{ margin: "0 0 var(--space-m) 0", fontSize: "13px", color: "var(--color-ink-muted)" }}>
+            <p className="apnea-info-detail">
               Ta pire perf. sur la période :{" "}
-              <strong style={{ color: "var(--color-ink)" }}>{formatDuration(stats.worst.durationSec)}</strong>,{" "}
+              <strong className="apnea-info-detail-value">{formatDuration(stats.worst.durationSec)}</strong>,{" "}
               {whenLabel(stats.worst.date)}.
             </p>
           )}
 
-          <p style={{ margin: "0 0 4px 0", fontSize: "14px", lineHeight: 1.5 }}>
-            <strong style={{ color: "var(--color-success)" }}>Meilleure perf.</strong> : l'écart entre ta mesure la
+          <p className="apnea-info-text">
+            <strong className="apnea-info-strong--success">Meilleure perf.</strong> : l'écart entre ta mesure la
             plus longue et cette même moyenne. Plus ce nombre est grand, plus tu as dépassé ta moyenne.
           </p>
           {stats && (
-            <p style={{ margin: 0, fontSize: "13px", color: "var(--color-ink-muted)" }}>
+            <p className="apnea-info-detail">
               Ta meilleure perf. sur la période :{" "}
-              <strong style={{ color: "var(--color-ink)" }}>{formatDuration(stats.best.durationSec)}</strong>,{" "}
+              <strong className="apnea-info-detail-value">{formatDuration(stats.best.durationSec)}</strong>,{" "}
               {whenLabel(stats.best.date)}.
             </p>
           )}
@@ -329,44 +247,24 @@ function RecentPerformancesCard({ sessions }: { sessions: ApneaSession[] }) {
       <CardLabel>Performances récentes</CardLabel>
 
       {shownDates.length === 0 ? (
-        <p style={{ margin: 0, fontSize: "14px", color: "var(--color-ink-muted)" }}>
+        <p className="apnea-empty-message">
           Pas encore de mesure sur les {RECENT_LOOKBACK_DAYS} derniers jours (hors aujourd'hui).
         </p>
       ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+        <div className="apnea-recent-list">
           {shownDates.map((date, i) => {
             const avg = averageDuration(sessions.filter((s) => s.date === date).map((s) => s.durationSec))!;
             return (
-              <div
-                key={date}
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  fontSize: "14px",
-                  padding: "6px 0",
-                  borderTop: i === 0 ? "none" : "1px solid var(--color-border)",
-                }}
-              >
+              <div key={date} className={`apnea-recent-row ${i === 0 ? "apnea-recent-row--first" : ""}`}>
                 <span>{relativeDayLabel(date)}</span>
-                <span style={{ fontWeight: 600 }}>{formatDuration(avg)}</span>
+                <span className="apnea-recent-duration">{formatDuration(avg)}</span>
               </div>
             );
           })}
         </div>
       )}
 
-      <button
-        onClick={() => navigate("/apnee/historique")}
-        style={{
-          border: "none",
-          background: "transparent",
-          color: "var(--color-teal)",
-          fontSize: "13px",
-          fontWeight: 600,
-          padding: 0,
-          marginTop: "var(--space-s)",
-        }}
-      >
+      <button onClick={() => navigate("/apnee/historique")} className="apnea-history-link">
         Historique complet →
       </button>
     </Card>
@@ -377,33 +275,28 @@ function TimerButton({
   label,
   onClick,
   variant,
-  color,
+  tone,
   fullWidth,
   disabled,
 }: {
   label: string;
   onClick: () => void;
   variant: "filled" | "outline";
-  color: string;
+  tone: "teal" | "alert" | "muted" | "depth";
   fullWidth?: boolean;
   disabled?: boolean;
 }) {
+  const classes = [
+    "timer-button",
+    `timer-button--${variant}`,
+    `timer-button--${tone}`,
+    fullWidth ? "timer-button--full-width" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      style={{
-        gridColumn: fullWidth ? "1 / -1" : undefined,
-        border: variant === "outline" ? `1.5px solid ${color}` : "none",
-        borderRadius: "var(--radius-m)",
-        padding: "14px",
-        background: variant === "filled" ? color : "transparent",
-        color: variant === "filled" ? "white" : color,
-        fontSize: "16px",
-        fontWeight: 700,
-        opacity: disabled ? 0.4 : 1,
-      }}
-    >
+    <button onClick={onClick} disabled={disabled} className={classes}>
       {label}
     </button>
   );

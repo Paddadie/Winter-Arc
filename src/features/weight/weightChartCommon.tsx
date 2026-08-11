@@ -1,4 +1,5 @@
 import type { WeightSeriesPoint } from "../../domain/weightSeries";
+import "../../components/chartTooltip.css";
 import "./weightChartCommon.css";
 
 /**
