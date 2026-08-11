@@ -1,0 +1,50 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-m) var(--space-l);
+  padding-top: calc(var(--space-l) + env(safe-area-inset-top));
+  position: sticky;
+  top: 0;
+  background: var(--color-surface);
+  z-index: 10;
+}
+
+.page-back-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: transparent;
+  color: var(--page-accent);
+  font-size: 17px;
+  font-weight: 600;
+  padding: 8px 4px;
+}
+
+.page-back-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.page-title {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 var(--space-m) 0;
+  padding: 0 var(--space-l);
+}
+
+.page-main {
+  flex: 1;
+  padding: 0 var(--space-l) var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-l);
+}

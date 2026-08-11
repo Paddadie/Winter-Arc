@@ -1,0 +1,26 @@
+.weight-history-empty {
+  margin: 0;
+  color: var(--color-ink-muted);
+  font-size: 14px;
+}
+
+.weight-history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0 var(--space-m) var(--space-s) var(--space-m);
+}
+
+.weight-history-reset-button {
+  border: none;
+  background: transparent;
+  color: var(--color-coral);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 0;
+}
+
+.weight-history-canvas {
+  width: 100%;
+  height: 300px;
+}

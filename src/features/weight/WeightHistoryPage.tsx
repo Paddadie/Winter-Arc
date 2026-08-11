@@ -10,6 +10,7 @@ import { getDailyLogsBetween } from "../../db/dailyLogRepo";
 import { buildWeightSeries, type WeightSeriesPoint } from "../../domain/weightSeries";
 import { todayISO } from "../../utils/date";
 import type { WeightEntry, WeightGoal, DailyLog } from "../../db/schema";
+import "./WeightHistoryPage.css";
 
 export function WeightHistoryPage() {
   const [goal, setGoal] = useState<WeightGoal | null>(null);
@@ -35,7 +36,7 @@ export function WeightHistoryPage() {
   if (loading) {
     return (
       <PageLayout title="Historique" accentColor="var(--color-coral)" backTo="/regime" backLabel="Régime">
-        <p style={{ color: "var(--color-ink-muted)" }}>Chargement…</p>
+        <p className="weight-history-loading">Chargement…</p>
       </PageLayout>
     );
   }
@@ -75,9 +76,7 @@ function PeriodStats({ series }: { series: WeightSeriesPoint[] }) {
   if (realPoints.length === 0 || series.length === 0) {
     return (
       <Card>
-        <p style={{ margin: 0, color: "var(--color-ink-muted)", fontSize: "14px" }}>
-          Aucune donnée de poids sur la période affichée.
-        </p>
+        <p className="period-stats-empty">Aucune donnée de poids sur la période affichée.</p>
       </Card>
     );
   }
@@ -90,16 +89,16 @@ function PeriodStats({ series }: { series: WeightSeriesPoint[] }) {
 
   return (
     <Card>
-      <p style={{ margin: "0 0 var(--space-m) 0", fontSize: "13px", color: "var(--color-ink-muted)" }}>
+      <p className="period-stats-subtitle">
         Du {formatShortDate(series[0].date)} au {formatShortDate(series[series.length - 1].date)}
       </p>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-m)" }}>
+      <div className="period-stats-grid">
         <StatBlock label="Début" value={formatKg(startWeight)} />
         <StatBlock label="Fin" value={formatKg(endWeight)} />
         <StatBlock
           label="Variation"
           value={`${variation > 0 ? "+" : ""}${variation.toFixed(1).replace(".", ",")} kg`}
-          color={variation > 0 ? "var(--color-alert)" : "var(--color-success)"}
+          variant={variation > 0 ? "alert" : "success"}
         />
         <StatBlock label="Min – Max" value={`${formatKg(minWeight)} – ${formatKg(maxWeight)}`} />
       </div>

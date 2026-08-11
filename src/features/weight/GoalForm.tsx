@@ -3,6 +3,7 @@ import { Card } from "../../components/Card";
 import { setGoal } from "../../db/goalRepo";
 import { todayISO } from "../../utils/date";
 import type { WeightGoal } from "../../db/schema";
+import "./GoalForm.css";
 
 interface GoalFormProps {
   currentGoal: WeightGoal | null;
@@ -59,114 +60,56 @@ export function GoalForm({ currentGoal, latestWeightKg, onSaved, onCancel }: Goa
   }
 
   return (
-    <Card style={{ background: "var(--color-coral-soft)", border: "none" }}>
-      <p
-        style={{
-          margin: "0 0 var(--space-m) 0",
-          fontFamily: "var(--font-display)",
-          fontSize: "18px",
-          fontWeight: 700,
-        }}
-      >
-        {currentGoal ? "Modifier l'objectif" : "Définir un objectif"}
-      </p>
+    <Card className="goal-form-card">
+      <p className="goal-form-title">{currentGoal ? "Modifier l'objectif" : "Définir un objectif"}</p>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-m)" }}>
-        <label style={labelStyle}>
+      <div className="goal-form-fields">
+        <label className="goal-form-field">
           Poids de départ (kg)
           <input
             type="text"
             inputMode="decimal"
             value={startWeight}
             onChange={(e) => setStartWeight(e.target.value)}
-            style={inputStyle}
+            className="goal-form-input"
           />
         </label>
 
-        <label style={labelStyle}>
+        <label className="goal-form-field">
           Poids objectif (kg)
           <input
             type="text"
             inputMode="decimal"
             value={targetWeight}
             onChange={(e) => setTargetWeight(e.target.value)}
-            style={inputStyle}
+            className="goal-form-input"
           />
         </label>
 
-        <label style={labelStyle}>
+        <label className="goal-form-field">
           Date cible
           <input
             type="date"
             value={targetDate}
             min={minDate}
             onChange={(e) => setTargetDate(e.target.value)}
-            style={inputStyle}
+            className="goal-form-input"
           />
         </label>
       </div>
 
-      {error && (
-        <p style={{ margin: "var(--space-s) 0 0 0", fontSize: "13px", color: "var(--color-alert)" }}>
-          {error}
-        </p>
-      )}
+      {error && <p className="goal-form-error">{error}</p>}
 
-      <div style={{ display: "flex", gap: "var(--space-s)", marginTop: "var(--space-l)" }}>
+      <div className="goal-form-actions">
         {onCancel && (
-          <button
-            onClick={onCancel}
-            style={{
-              flex: 1,
-              border: "none",
-              borderRadius: "var(--radius-m)",
-              padding: "12px",
-              background: "transparent",
-              color: "var(--color-ink-muted)",
-              fontWeight: 600,
-              fontSize: "15px",
-            }}
-          >
+          <button onClick={onCancel} className="goal-form-cancel">
             Annuler
           </button>
         )}
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          style={{
-            flex: 2,
-            border: "none",
-            borderRadius: "var(--radius-m)",
-            padding: "12px",
-            background: "var(--color-coral)",
-            color: "white",
-            fontWeight: 700,
-            fontSize: "15px",
-            opacity: saving ? 0.6 : 1,
-          }}
-        >
+        <button onClick={handleSave} disabled={saving} className="goal-form-submit">
           Valider l'objectif
         </button>
       </div>
     </Card>
   );
 }
-
-const labelStyle: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  gap: "6px",
-  fontSize: "13px",
-  fontWeight: 600,
-  color: "var(--color-ink-muted)",
-};
-
-const inputStyle: React.CSSProperties = {
-  fontSize: "16px",
-  padding: "10px 12px",
-  borderRadius: "var(--radius-s)",
-  border: "1px solid var(--color-border)",
-  background: "var(--color-surface-raised)",
-  color: "var(--color-ink)",
-  fontWeight: 600,
-};

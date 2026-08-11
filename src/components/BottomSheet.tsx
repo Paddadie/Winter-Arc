@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
+import "./BottomSheet.css";
 
-const TRANSITION_MS = 220;
+const TRANSITION_MS = 220; // doit rester synchro avec la durée des transitions dans BottomSheet.css
 
 interface BottomSheetProps {
   onClose: () => void;
@@ -30,25 +31,11 @@ export function BottomSheet({ onClose, children }: BottomSheetProps) {
   return (
     <div
       onClick={handleClose}
-      style={{
-        position: "fixed",
-        inset: 0,
-        background: visible ? "rgba(15, 32, 39, 0.4)" : "rgba(15, 32, 39, 0)",
-        transition: `background ${TRANSITION_MS}ms ease-out`,
-        display: "flex",
-        alignItems: "flex-end",
-        justifyContent: "center",
-        zIndex: 50,
-      }}
+      className={`bottom-sheet-backdrop ${visible ? "bottom-sheet-backdrop--visible" : ""}`}
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        style={{
-          width: "100%",
-          maxWidth: "480px",
-          transform: visible ? "translateY(0)" : "translateY(100%)",
-          transition: `transform ${TRANSITION_MS}ms ease-out`,
-        }}
+        className={`bottom-sheet-panel ${visible ? "bottom-sheet-panel--visible" : ""}`}
       >
         {children(handleClose)}
       </div>

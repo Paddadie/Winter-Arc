@@ -1,0 +1,16 @@
+.card-label {
+  margin: 0 0 var(--space-s) 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-ink-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.card-label--flush {
+  margin: 0;
+}
+
+.card-label--chart {
+  margin: 0 var(--space-m) var(--space-s) var(--space-m);
+}

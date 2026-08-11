@@ -1,0 +1,36 @@
+.weight-summary-label {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-ink-muted);
+  font-weight: 600;
+}
+
+.weight-summary-value {
+  margin: 2px 0 0 0;
+  font-family: var(--font-display);
+  font-size: 40px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.weight-summary-date {
+  margin: 4px 0 0 0;
+  font-size: 13px;
+  color: var(--color-ink-muted);
+}
+
+.weight-summary-goal-row {
+  margin-top: var(--space-m);
+  padding-top: var(--space-m);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  justify-content: space-between;
+}
+
+.weight-summary-empty {
+  margin-top: var(--space-m);
+  padding-top: var(--space-m);
+  border-top: 1px solid var(--color-border);
+  font-size: 13px;
+  color: var(--color-ink-muted);
+}

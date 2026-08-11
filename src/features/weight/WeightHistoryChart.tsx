@@ -15,6 +15,7 @@ import { CardLabel } from "../../components/CardLabel";
 import { todayISO } from "../../utils/date";
 import { WeightDot, ChartTooltip, Legend, formatTick } from "./weightChartCommon";
 import type { WeightSeriesPoint } from "../../domain/weightSeries";
+import "./WeightHistoryChart.css";
 
 interface WeightHistoryChartProps {
   series: WeightSeriesPoint[];
@@ -60,42 +61,23 @@ export function WeightHistoryChart({ series, hasGoal, onSelectDate, onVisibleRan
   if (!hasAnyWeight) {
     return (
       <Card>
-        <p style={{ margin: 0, color: "var(--color-ink-muted)", fontSize: "14px" }}>
-          Aucune pesée enregistrée pour le moment.
-        </p>
+        <p className="weight-history-empty">Aucune pesée enregistrée pour le moment.</p>
       </Card>
     );
   }
 
   return (
-    <Card style={{ padding: "var(--space-m) var(--space-s) var(--space-m) var(--space-xs)" }}>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          margin: "0 var(--space-m) var(--space-s) var(--space-m)",
-        }}
-      >
-        <CardLabel style={{ margin: 0 }}>Historique</CardLabel>
+    <Card className="card--flat">
+      <div className="weight-history-header">
+        <CardLabel className="card-label--flush">Historique</CardLabel>
         {isZoomed && (
-          <button
-            onClick={resetZoom}
-            style={{
-              border: "none",
-              background: "transparent",
-              color: "var(--color-coral)",
-              fontSize: "12px",
-              fontWeight: 600,
-              padding: 0,
-            }}
-          >
+          <button onClick={resetZoom} className="weight-history-reset-button">
             Réinitialiser le zoom
           </button>
         )}
       </div>
 
-      <div style={{ width: "100%", height: 300 }}>
+      <div className="weight-history-canvas">
         <ResponsiveContainer>
           <ComposedChart data={series} margin={{ top: 8, right: 12, bottom: 22, left: -12 }} onClick={handleChartClick}>
             <CartesianGrid stroke="var(--color-border)" vertical={false} />

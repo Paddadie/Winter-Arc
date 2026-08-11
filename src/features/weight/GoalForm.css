@@ -1,0 +1,74 @@
+.goal-form-card {
+  background: var(--color-coral-soft);
+  border: none;
+}
+
+.goal-form-title {
+  margin: 0 0 var(--space-m) 0;
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.goal-form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-m);
+}
+
+.goal-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-ink-muted);
+}
+
+.goal-form-input {
+  font-size: 16px;
+  padding: 10px 12px;
+  border-radius: var(--radius-s);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-raised);
+  color: var(--color-ink);
+  font-weight: 600;
+}
+
+.goal-form-error {
+  margin: var(--space-s) 0 0 0;
+  font-size: 13px;
+  color: var(--color-alert);
+}
+
+.goal-form-actions {
+  display: flex;
+  gap: var(--space-s);
+  margin-top: var(--space-l);
+}
+
+.goal-form-cancel {
+  flex: 1;
+  border: none;
+  border-radius: var(--radius-m);
+  padding: 12px;
+  background: transparent;
+  color: var(--color-ink-muted);
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.goal-form-submit {
+  flex: 2;
+  border: none;
+  border-radius: var(--radius-m);
+  padding: 12px;
+  background: var(--color-coral);
+  color: white;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.goal-form-submit:disabled {
+  opacity: 0.6;
+}

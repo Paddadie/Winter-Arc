@@ -1,0 +1,21 @@
+.weight-history-loading {
+  color: var(--color-ink-muted);
+}
+
+.period-stats-empty {
+  margin: 0;
+  color: var(--color-ink-muted);
+  font-size: 14px;
+}
+
+.period-stats-subtitle {
+  margin: 0 0 var(--space-m) 0;
+  font-size: 13px;
+  color: var(--color-ink-muted);
+}
+
+.period-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-m);
+}

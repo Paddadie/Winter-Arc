@@ -1,4 +1,5 @@
 import type { WeightSeriesPoint } from "../../domain/weightSeries";
+import "./weightChartCommon.css";
 
 /**
  * Éléments de graphique partagés entre le graphique récent (WeightChart)
@@ -54,16 +55,8 @@ export function ChartTooltip({
   if (!active || !payload || payload.length === 0 || !label) return null;
   const point: WeightSeriesPoint = payload[0].payload;
   return (
-    <div
-      style={{
-        background: "var(--color-depth)",
-        color: "white",
-        borderRadius: "10px",
-        padding: "8px 12px",
-        fontSize: "12px",
-      }}
-    >
-      <div style={{ fontWeight: 700, marginBottom: "2px" }}>{formatTick(label)}</div>
+    <div className="chart-tooltip">
+      <div className="chart-tooltip-title">{formatTick(label)}</div>
       {point.weightKg !== null && (
         <div>
           {point.isReal ? "Mesuré : " : "Estimé : "}
@@ -71,7 +64,7 @@ export function ChartTooltip({
         </div>
       )}
       {point.goalWeightKg !== null && (
-        <div style={{ opacity: 0.8 }}>Objectif : {point.goalWeightKg.toFixed(1).replace(".", ",")} kg</div>
+        <div className="chart-tooltip-goal">Objectif : {point.goalWeightKg.toFixed(1).replace(".", ",")} kg</div>
       )}
     </div>
   );
@@ -79,17 +72,7 @@ export function ChartTooltip({
 
 export function Legend({ hasGoal }: { hasGoal: boolean }) {
   return (
-    <div
-      style={{
-        display: "flex",
-        gap: "var(--space-m)",
-        flexWrap: "wrap",
-        marginTop: "var(--space-s)",
-        marginLeft: "var(--space-m)",
-        fontSize: "12px",
-        color: "var(--color-ink-muted)",
-      }}
-    >
+    <div className="chart-legend">
       <LegendItem color="var(--color-coral)" label="Mesuré" filled />
       <LegendItem color="var(--color-coral)" label="Estimé" filled={false} />
       {hasGoal && <LegendItem color="var(--color-depth)" label="Objectif" dashed />}
@@ -111,7 +94,7 @@ function LegendItem({
   dashed?: boolean;
 }) {
   return (
-    <span style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+    <span className="chart-legend-item">
       {dashed ? (
         <svg width="14" height="8">
           <line x1="0" y1="4" x2="14" y2="4" stroke={color} strokeWidth="2" strokeDasharray="4 3" />

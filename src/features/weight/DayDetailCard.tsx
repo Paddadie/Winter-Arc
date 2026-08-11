@@ -1,6 +1,7 @@
 import { Card } from "../../components/Card";
 import { BottomSheet } from "../../components/BottomSheet";
 import type { WeightSeriesPoint } from "../../domain/weightSeries";
+import "./DayDetailCard.css";
 
 interface DayDetailCardProps {
   point: WeightSeriesPoint;
@@ -15,36 +16,10 @@ export function DayDetailCard({ point, onClose }: DayDetailCardProps) {
   return (
     <BottomSheet onClose={onClose}>
       {(close) => (
-        <Card
-          style={{
-            borderRadius: "var(--radius-l) var(--radius-l) 0 0",
-            paddingBottom: "calc(var(--space-l) + env(safe-area-inset-bottom))",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: "var(--space-s)",
-            }}
-          >
-            <p style={{ margin: 0, fontSize: "17px", fontWeight: 700, textTransform: "capitalize" }}>
-              {formatFullDate(point.date)}
-            </p>
-            <button
-              onClick={close}
-              aria-label="Fermer"
-              style={{
-                border: "none",
-                background: "var(--color-surface)",
-                color: "var(--color-ink-muted)",
-                width: "32px",
-                height: "32px",
-                borderRadius: "50%",
-                fontSize: "15px",
-              }}
-            >
+        <Card className="card--sheet">
+          <div className="day-detail-header">
+            <p className="day-detail-title">{formatFullDate(point.date)}</p>
+            <button onClick={close} aria-label="Fermer" className="day-detail-close-button">
               ✕
             </button>
           </div>
@@ -61,18 +36,18 @@ export function DayDetailCard({ point, onClose }: DayDetailCardProps) {
             <DetailRow
               label="Écart vs objectif"
               value={`${diff > 0 ? "+" : ""}${diff.toFixed(1).replace(".", ",").replace("-0,0", "0,0")} kg`}
-              color={diff > 0 ? "var(--color-alert)" : "var(--color-success)"}
+              variant={diff > 0 ? "alert" : "success"}
             />
           )}
           <DetailRow
             label="Sport"
             value={point.sport === null ? "Non renseigné" : point.sport ? "Oui" : "Non"}
-            color={point.sport ? "var(--color-success)" : undefined}
+            variant={point.sport ? "success" : undefined}
           />
           <DetailRow
             label="Écart alimentaire"
             value={point.foodDeviation === null ? "Non renseigné" : point.foodDeviation ? "Oui" : "Non"}
-            color={point.foodDeviation ? "var(--color-alert)" : undefined}
+            variant={point.foodDeviation ? "alert" : undefined}
           />
         </Card>
       )}
@@ -80,18 +55,11 @@ export function DayDetailCard({ point, onClose }: DayDetailCardProps) {
   );
 }
 
-function DetailRow({ label, value, color }: { label: string; value: string; color?: string }) {
+function DetailRow({ label, value, variant }: { label: string; value: string; variant?: "success" | "alert" }) {
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        padding: "10px 0",
-        borderTop: "1px solid var(--color-border)",
-      }}
-    >
-      <span style={{ color: "var(--color-ink-muted)", fontSize: "14px" }}>{label}</span>
-      <span style={{ fontWeight: 600, fontSize: "14px", color: color ?? "var(--color-ink)" }}>{value}</span>
+    <div className="detail-row">
+      <span className="detail-row-label">{label}</span>
+      <span className={`detail-row-value ${variant ? `detail-row-value--${variant}` : ""}`}>{value}</span>
     </div>
   );
 }

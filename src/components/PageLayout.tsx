@@ -1,5 +1,6 @@
-import type { ReactNode } from "react";
+import type { ReactNode, CSSProperties } from "react";
 import { useNavigate } from "react-router-dom";
+import "./PageLayout.css";
 
 interface PageLayoutProps {
   title: string;
@@ -14,7 +15,9 @@ interface PageLayoutProps {
 
 /**
  * Layout commun à toutes les pages fonctionnelles (hors accueil).
- * Fournit le bouton retour et un en-tête cohérent.
+ * Fournit le bouton retour et un en-tête cohérent. `accentColor` est une
+ * valeur choisie à l'exécution par chaque page (corail, teal...), passée à
+ * la CSS via une custom property plutôt qu'un style inline complet.
  */
 export function PageLayout({
   title,
@@ -27,62 +30,21 @@ export function PageLayout({
   const navigate = useNavigate();
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", minHeight: "100dvh" }}>
-      <header
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "var(--space-m) var(--space-l)",
-          paddingTop: "calc(var(--space-l) + env(safe-area-inset-top))",
-          position: "sticky",
-          top: 0,
-          background: "var(--color-surface)",
-          zIndex: 10,
-        }}
-      >
+    <div className="page">
+      <header className="page-header">
         <button
           onClick={() => navigate(backTo)}
           aria-label={`Retour${backLabel === "Accueil" ? " à l'accueil" : ` à ${backLabel}`}`}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "6px",
-            border: "none",
-            background: "transparent",
-            color: accentColor,
-            fontSize: "17px",
-            fontWeight: 600,
-            padding: "8px 4px",
-          }}
+          className="page-back-button"
+          style={{ "--page-accent": accentColor } as CSSProperties}
         >
-          <span style={{ fontSize: "20px", lineHeight: 1 }}>‹</span>
+          <span className="page-back-icon">‹</span>
           {backLabel}
         </button>
         {headerAction}
       </header>
-      <h1
-        style={{
-          fontFamily: "var(--font-display)",
-          fontSize: "28px",
-          fontWeight: 700,
-          margin: "0 0 var(--space-m) 0",
-          padding: "0 var(--space-l)",
-        }}
-      >
-        {title}
-      </h1>
-      <main
-        style={{
-          flex: 1,
-          padding: "0 var(--space-l) var(--space-xl)",
-          display: "flex",
-          flexDirection: "column",
-          gap: "var(--space-l)",
-        }}
-      >
-        {children}
-      </main>
+      <h1 className="page-title">{title}</h1>
+      <main className="page-main">{children}</main>
     </div>
   );
 }

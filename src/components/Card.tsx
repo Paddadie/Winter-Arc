@@ -1,16 +1,17 @@
 import type { ReactNode, CSSProperties } from "react";
+import "./Card.css";
 
-export function Card({ children, style }: { children: ReactNode; style?: CSSProperties }) {
+interface CardProps {
+  children: ReactNode;
+  className?: string;
+  /** @deprecated à retirer une fois toutes les features migrées vers des classes CSS. */
+  style?: CSSProperties;
+}
+
+export function Card({ children, className, style }: CardProps) {
+  const classes = ["card", className].filter(Boolean).join(" ");
   return (
-    <div
-      style={{
-        background: "var(--color-surface-raised)",
-        borderRadius: "var(--radius-l)",
-        padding: "var(--space-l)",
-        border: "1px solid var(--color-border)",
-        ...style,
-      }}
-    >
+    <div className={classes} style={style}>
       {children}
     </div>
   );

@@ -14,6 +14,7 @@ import { CardLabel } from "../../components/CardLabel";
 import { todayISO } from "../../utils/date";
 import { WeightDot, ChartTooltip, Legend, formatTick } from "./weightChartCommon";
 import type { WeightSeriesPoint } from "../../domain/weightSeries";
+import "./WeightChart.css";
 
 interface WeightChartProps {
   series: WeightSeriesPoint[];
@@ -30,15 +31,13 @@ export function WeightChart({ series, hasGoal, onSelectDate }: WeightChartProps)
   }
 
   return (
-    <Card style={{ padding: "var(--space-m) var(--space-s) var(--space-m) var(--space-xs)" }}>
-      <CardLabel style={{ margin: "0 var(--space-m) var(--space-s) var(--space-m)" }}>Évolution récente</CardLabel>
+    <Card className="card--flat">
+      <CardLabel className="card-label--chart">Évolution récente</CardLabel>
 
       {!hasAnyWeight ? (
-        <p style={{ margin: "var(--space-l) var(--space-m)", color: "var(--color-ink-muted)", fontSize: "14px" }}>
-          Enregistre quelques pesées pour voir le graphique apparaître.
-        </p>
+        <p className="weight-chart-empty">Enregistre quelques pesées pour voir le graphique apparaître.</p>
       ) : (
-        <div style={{ width: "100%", height: 238 }}>
+        <div className="weight-chart-canvas">
           <ResponsiveContainer>
             <ComposedChart
               data={series}
@@ -95,19 +94,7 @@ export function WeightChart({ series, hasGoal, onSelectDate }: WeightChartProps)
 
       <Legend hasGoal={hasGoal} />
 
-      <button
-        onClick={() => navigate("/regime/historique")}
-        style={{
-          border: "none",
-          background: "transparent",
-          color: "var(--color-coral)",
-          fontSize: "13px",
-          fontWeight: 600,
-          padding: 0,
-          marginTop: "var(--space-s)",
-          marginLeft: "var(--space-m)",
-        }}
-      >
+      <button onClick={() => navigate("/regime/historique")} className="weight-chart-history-link">
         Historique →
       </button>
     </Card>

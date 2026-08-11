@@ -1,0 +1,49 @@
+.day-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-s);
+}
+
+.day-detail-title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.day-detail-close-button {
+  border: none;
+  background: var(--color-surface);
+  color: var(--color-ink-muted);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 15px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.detail-row-label {
+  color: var(--color-ink-muted);
+  font-size: 14px;
+}
+
+.detail-row-value {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--color-ink);
+}
+
+.detail-row-value--success {
+  color: var(--color-success);
+}
+
+.detail-row-value--alert {
+  color: var(--color-alert);
+}

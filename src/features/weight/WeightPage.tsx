@@ -11,6 +11,7 @@ import { getDailyLogsBetween } from "../../db/dailyLogRepo";
 import { buildWeightSeries } from "../../domain/weightSeries";
 import { todayISO, addDays } from "../../utils/date";
 import type { WeightEntry, WeightGoal, DailyLog } from "../../db/schema";
+import "./WeightPage.css";
 
 const WINDOW_START = addDays(todayISO(), -15);
 const WINDOW_END = addDays(todayISO(), 5);
@@ -50,7 +51,7 @@ export function WeightPage() {
   if (loading) {
     return (
       <PageLayout title="Régime" accentColor="var(--color-coral)">
-        <p style={{ color: "var(--color-ink-muted)" }}>Chargement…</p>
+        <p className="weight-page-loading">Chargement…</p>
       </PageLayout>
     );
   }
@@ -63,22 +64,7 @@ export function WeightPage() {
       title="Régime"
       accentColor="var(--color-coral)"
       headerAction={
-        <button
-          onClick={() => setShowGoalForm(true)}
-          aria-label="Modifier l'objectif"
-          style={{
-            border: "none",
-            background: "var(--color-coral-soft)",
-            color: "var(--color-coral)",
-            width: "40px",
-            height: "40px",
-            borderRadius: "50%",
-            fontSize: "18px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
+        <button onClick={() => setShowGoalForm(true)} aria-label="Modifier l'objectif" className="weight-goal-button">
           🎯
         </button>
       }

@@ -1,0 +1,114 @@
+.day-entry-date-row {
+  margin-top: 6px;
+}
+
+.day-entry-date-input {
+  font-size: 14px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.day-entry-date-toggle {
+  border: none;
+  background: transparent;
+  color: var(--color-ink-muted);
+  font-size: 13px;
+  padding: 0;
+  text-decoration: underline;
+}
+
+.day-entry-weight-row {
+  display: flex;
+  gap: var(--space-s);
+  margin-top: var(--space-m);
+}
+
+.day-entry-weight-input-wrap {
+  position: relative;
+  flex: 1;
+}
+
+.day-entry-weight-input {
+  width: 100%;
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  padding: 12px 44px 12px 16px;
+  border-radius: var(--radius-m);
+  border: 1.5px solid var(--color-border);
+  color: var(--color-ink);
+  background: var(--color-surface);
+}
+
+.day-entry-weight-input--error {
+  border-color: var(--color-alert);
+}
+
+.day-entry-weight-suffix {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-ink-muted);
+  font-size: 16px;
+  font-weight: 600;
+  pointer-events: none;
+}
+
+.day-entry-save-button {
+  border: none;
+  border-radius: var(--radius-m);
+  padding: 0 var(--space-l);
+  background: var(--color-coral);
+  color: white;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.day-entry-save-button:disabled {
+  opacity: 0.6;
+}
+
+.day-entry-feedback {
+  margin: 8px 0 0 0;
+  font-size: 13px;
+  color: var(--color-success);
+  font-weight: 600;
+}
+
+.day-entry-error {
+  margin: 8px 0 0 0;
+  font-size: 13px;
+  color: var(--color-alert);
+}
+
+.day-entry-chips-row {
+  display: flex;
+  gap: var(--space-s);
+  margin-top: var(--space-m);
+}
+
+.chip {
+  flex: 1;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-m);
+  padding: 10px 12px;
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.chip--success.chip--active {
+  border-color: var(--color-success);
+  background: var(--color-success);
+  color: white;
+}
+
+.chip--alert.chip--active {
+  border-color: var(--color-alert);
+  background: var(--color-alert);
+  color: white;
+}

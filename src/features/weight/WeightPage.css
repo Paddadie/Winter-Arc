@@ -1,0 +1,16 @@
+.weight-page-loading {
+  color: var(--color-ink-muted);
+}
+
+.weight-goal-button {
+  border: none;
+  background: var(--color-coral-soft);
+  color: var(--color-coral);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

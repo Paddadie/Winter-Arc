@@ -5,6 +5,7 @@ import { addWeightEntry } from "../../db/weightRepo";
 import { getDailyLog, setDailyLog } from "../../db/dailyLogRepo";
 import { todayISO } from "../../utils/date";
 import type { WeightEntry } from "../../db/schema";
+import "./DayEntryCard.css";
 
 interface DayEntryCardProps {
   entries: WeightEntry[];
@@ -79,42 +80,26 @@ export function DayEntryCard({ entries, onSaved }: DayEntryCardProps) {
 
   return (
     <Card>
-      <CardLabel style={{ margin: 0 }}>Suivi du jour</CardLabel>
+      <CardLabel className="card-label--flush">Suivi du jour</CardLabel>
 
-      <div style={{ marginTop: "6px" }}>
+      <div className="day-entry-date-row">
         {showDateEdit ? (
           <input
             type="date"
             value={date}
             max={todayISO()}
             onChange={(e) => setDate(e.target.value)}
-            style={{
-              fontSize: "14px",
-              padding: "6px 8px",
-              borderRadius: "8px",
-              border: "1px solid var(--color-border)",
-              background: "var(--color-surface)",
-            }}
+            className="day-entry-date-input"
           />
         ) : (
-          <button
-            onClick={() => setShowDateEdit(true)}
-            style={{
-              border: "none",
-              background: "transparent",
-              color: "var(--color-ink-muted)",
-              fontSize: "13px",
-              padding: 0,
-              textDecoration: "underline",
-            }}
-          >
+          <button onClick={() => setShowDateEdit(true)} className="day-entry-date-toggle">
             {date === todayISO() ? "Aujourd'hui" : date} · modifier la date
           </button>
         )}
       </div>
 
-      <div style={{ display: "flex", gap: "var(--space-s)", marginTop: "var(--space-m)" }}>
-        <div style={{ position: "relative", flex: 1 }}>
+      <div className="day-entry-weight-row">
+        <div className="day-entry-weight-input-wrap">
           <input
             type="text"
             inputMode="decimal"
@@ -125,63 +110,21 @@ export function DayEntryCard({ entries, onSaved }: DayEntryCardProps) {
               setWeightError(null);
             }}
             onKeyDown={(e) => e.key === "Enter" && handleSaveWeight()}
-            style={{
-              width: "100%",
-              fontFamily: "var(--font-display)",
-              fontSize: "28px",
-              fontWeight: 700,
-              padding: "12px 44px 12px 16px",
-              borderRadius: "var(--radius-m)",
-              border: `1.5px solid ${weightError ? "var(--color-alert)" : "var(--color-border)"}`,
-              color: "var(--color-ink)",
-              background: "var(--color-surface)",
-            }}
+            className={`day-entry-weight-input ${weightError ? "day-entry-weight-input--error" : ""}`}
           />
-          <span
-            style={{
-              position: "absolute",
-              right: "16px",
-              top: "50%",
-              transform: "translateY(-50%)",
-              color: "var(--color-ink-muted)",
-              fontSize: "16px",
-              fontWeight: 600,
-              pointerEvents: "none",
-            }}
-          >
-            kg
-          </span>
+          <span className="day-entry-weight-suffix">kg</span>
         </div>
-        <button
-          onClick={handleSaveWeight}
-          disabled={saving}
-          style={{
-            border: "none",
-            borderRadius: "var(--radius-m)",
-            padding: "0 var(--space-l)",
-            background: "var(--color-coral)",
-            color: "white",
-            fontSize: "16px",
-            fontWeight: 700,
-            opacity: saving ? 0.6 : 1,
-          }}
-        >
+        <button onClick={handleSaveWeight} disabled={saving} className="day-entry-save-button">
           Enregistrer
         </button>
       </div>
 
-      {savedFeedback && (
-        <p style={{ margin: "8px 0 0 0", fontSize: "13px", color: "var(--color-success)", fontWeight: 600 }}>
-          ✓ Enregistré
-        </p>
-      )}
-      {weightError && (
-        <p style={{ margin: "8px 0 0 0", fontSize: "13px", color: "var(--color-alert)" }}>{weightError}</p>
-      )}
+      {savedFeedback && <p className="day-entry-feedback">✓ Enregistré</p>}
+      {weightError && <p className="day-entry-error">{weightError}</p>}
 
-      <div style={{ display: "flex", gap: "var(--space-s)", marginTop: "var(--space-m)" }}>
-        <Chip label="🏃 Sport" active={sport} color="var(--color-success)" onClick={toggleSport} />
-        <Chip label="🍔 Écart" active={foodDeviation} color="var(--color-alert)" onClick={toggleFoodDeviation} />
+      <div className="day-entry-chips-row">
+        <Chip label="🏃 Sport" active={sport} variant="success" onClick={toggleSport} />
+        <Chip label="🍔 Écart" active={foodDeviation} variant="alert" onClick={toggleFoodDeviation} />
       </div>
     </Card>
   );
@@ -190,27 +133,18 @@ export function DayEntryCard({ entries, onSaved }: DayEntryCardProps) {
 function Chip({
   label,
   active,
-  color,
+  variant,
   onClick,
 }: {
   label: string;
   active: boolean;
-  color: string;
+  variant: "success" | "alert";
   onClick: () => void;
 }) {
   return (
     <button
       onClick={onClick}
-      style={{
-        flex: 1,
-        border: `1.5px solid ${active ? color : "var(--color-border)"}`,
-        borderRadius: "var(--radius-m)",
-        padding: "10px 12px",
-        background: active ? color : "var(--color-surface)",
-        color: active ? "white" : "var(--color-ink)",
-        fontSize: "15px",
-        fontWeight: 600,
-      }}
+      className={`chip chip--${variant} ${active ? "chip--active" : ""}`}
     >
       {label}
     </button>
