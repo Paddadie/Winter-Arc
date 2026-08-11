@@ -11,6 +11,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'prompt', // on gère nous-mêmes le bouton "Mettre à jour" (étape 11)
+      injectRegister: false, // enregistrement fait à la main via useRegisterSW (bandeau custom)
       includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
       manifest: {
         name: 'Suivi personnel',

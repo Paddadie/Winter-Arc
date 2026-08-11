@@ -6,6 +6,7 @@ import { ApneaPage } from "./features/apnea/ApneaPage";
 import { ApneaHistoryPage } from "./features/apnea/ApneaHistoryPage";
 import { SettingsPage } from "./features/settings/SettingsPage";
 import { DebugPage } from "./features/debug/DebugPage";
+import { UpdatePrompt } from "./components/UpdatePrompt";
 
 /**
  * HashRouter (plutôt que BrowserRouter) : indispensable en PWA installée
@@ -24,6 +25,7 @@ export default function App() {
         <Route path="/reglages" element={<SettingsPage />} />
         <Route path="/debug" element={<DebugPage />} />
       </Routes>
+      <UpdatePrompt />
     </HashRouter>
   );
 }
