@@ -15,10 +15,15 @@ import type { WeightSeriesPoint } from "../../domain/weightSeries";
 interface WeightChartProps {
   series: WeightSeriesPoint[];
   hasGoal: boolean;
+  onSelectDate: (date: string) => void;
 }
 
-export function WeightChart({ series, hasGoal }: WeightChartProps) {
+export function WeightChart({ series, hasGoal, onSelectDate }: WeightChartProps) {
   const hasAnyWeight = series.some((p) => p.weightKg !== null);
+
+  function handleChartClick(state: { activeLabel?: string | number } | null) {
+    if (state?.activeLabel != null) onSelectDate(String(state.activeLabel));
+  }
 
   return (
     <Card style={{ padding: "var(--space-m) var(--space-s) var(--space-m) var(--space-xs)" }}>
@@ -32,7 +37,7 @@ export function WeightChart({ series, hasGoal }: WeightChartProps) {
           letterSpacing: "0.03em",
         }}
       >
-        Évolution — 1 mois
+        Évolution récente
       </p>
 
       {!hasAnyWeight ? (
@@ -40,9 +45,13 @@ export function WeightChart({ series, hasGoal }: WeightChartProps) {
           Enregistre quelques pesées pour voir le graphique apparaître.
         </p>
       ) : (
-        <div style={{ width: "100%", height: 220 }}>
+        <div style={{ width: "100%", height: 238 }}>
           <ResponsiveContainer>
-            <ComposedChart data={series} margin={{ top: 8, right: 12, bottom: 0, left: -12 }}>
+            <ComposedChart
+              data={series}
+              margin={{ top: 8, right: 12, bottom: 22, left: -12 }}
+              onClick={handleChartClick}
+            >
               <CartesianGrid stroke="var(--color-border)" vertical={false} />
               <XAxis
                 dataKey="date"
@@ -96,14 +105,40 @@ export function WeightChart({ series, hasGoal }: WeightChartProps) {
   );
 }
 
+/**
+ * Le point de mesure, accompagné de deux petites pastilles (sport / écart)
+ * juste en dessous, au même cx/cy que Recharts calcule déjà pour ce jour.
+ * En les rattachant au même point plutôt qu'à un graphique séparé, elles
+ * restent alignées par construction — aucun risque de décalage d'échelle
+ * entre deux graphiques distincts.
+ */
 function WeightDot(props: { cx?: number; cy?: number; payload?: WeightSeriesPoint; index?: number }) {
   const { cx, cy, payload, index } = props;
   if (cx == null || cy == null || !payload || payload.weightKg == null) return null;
-  return payload.isReal ? (
-    <circle key={index} cx={cx} cy={cy} r={4} fill="var(--color-coral)" stroke="white" strokeWidth={1.5} />
-  ) : (
-    <circle key={index} cx={cx} cy={cy} r={3} fill="var(--color-surface-raised)" stroke="var(--color-coral)" strokeWidth={1.5} />
+  return (
+    <g key={index}>
+      {payload.isReal ? (
+        <circle cx={cx} cy={cy} r={4} fill="var(--color-coral)" stroke="white" strokeWidth={1.5} />
+      ) : (
+        <circle cx={cx} cy={cy} r={3} fill="var(--color-surface-raised)" stroke="var(--color-coral)" strokeWidth={1.5} />
+      )}
+      <DayMarker cx={cx} cy={cy + 9} shown={payload.foodDeviation === true} color="var(--color-alert)" />
+      <DayMarker cx={cx} cy={cy + 19} shown={payload.sport === true} color="var(--color-success)" />
+    </g>
   );
+}
+
+/**
+ * Une pastille sport/écart, empilée verticalement sous le point (écart en
+ * haut, sport en bas) pour rester lisible sur un écran étroit. Rien n'est
+ * dessiné si la valeur n'est pas "oui" — ni pour "non", ni pour "non
+ * renseigné" — afin de garder le graphique épuré : seul un jour marquant
+ * (sport fait / écart constaté) laisse une trace visuelle. Le détail
+ * complet des trois états reste disponible dans la fiche du jour.
+ */
+function DayMarker({ cx, cy, shown, color }: { cx: number; cy: number; shown: boolean; color: string }) {
+  if (!shown) return null;
+  return <circle cx={cx} cy={cy} r={2.5} fill={color} />;
 }
 
 function ChartTooltip({
@@ -157,6 +192,8 @@ function Legend({ hasGoal }: { hasGoal: boolean }) {
       <LegendItem color="var(--color-coral)" label="Mesuré" filled />
       <LegendItem color="var(--color-coral)" label="Estimé" filled={false} />
       {hasGoal && <LegendItem color="var(--color-depth)" label="Objectif" dashed />}
+      <LegendItem color="var(--color-success)" label="Sport" filled />
+      <LegendItem color="var(--color-alert)" label="Écart" filled />
     </div>
   );
 }

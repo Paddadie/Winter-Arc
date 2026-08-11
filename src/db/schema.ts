@@ -56,7 +56,7 @@ class AppDatabase extends Dexie {
   weightGoals!: EntityTable<WeightGoal, "id">;
 
   constructor() {
-    super("suivi-app-db");
+    super("winter-arc-db");
 
     // v1 : schéma initial. Toute évolution future (nouvelle tuile, nouveau champ)
     // doit passer par un nouveau .version(n) avec un .upgrade() si nécessaire,

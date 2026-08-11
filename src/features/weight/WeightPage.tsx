@@ -1,31 +1,40 @@
 import { useEffect, useState } from "react";
 import { PageLayout } from "../../components/PageLayout";
-import { QuickWeightEntry } from "./QuickWeightEntry";
+import { DayEntryCard } from "./DayEntryCard";
 import { GoalForm } from "./GoalForm";
 import { WeightSummaryCard } from "./WeightSummaryCard";
 import { WeightChart } from "./WeightChart";
+import { DayDetailCard } from "./DayDetailCard";
 import { getActiveGoal } from "../../db/goalRepo";
 import { getAllWeightEntries, getLatestWeightEntry } from "../../db/weightRepo";
+import { getDailyLogsBetween } from "../../db/dailyLogRepo";
 import { buildWeightSeries } from "../../domain/weightSeries";
 import { todayISO, addDays } from "../../utils/date";
-import type { WeightEntry, WeightGoal } from "../../db/schema";
+import type { WeightEntry, WeightGoal, DailyLog } from "../../db/schema";
+
+const WINDOW_START = addDays(todayISO(), -15);
+const WINDOW_END = addDays(todayISO(), 5);
 
 export function WeightPage() {
   const [goal, setGoal] = useState<WeightGoal | null>(null);
   const [entries, setEntries] = useState<WeightEntry[]>([]);
   const [latestEntry, setLatestEntry] = useState<WeightEntry | null>(null);
+  const [dailyLogs, setDailyLogs] = useState<DailyLog[]>([]);
   const [showGoalForm, setShowGoalForm] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   async function refresh() {
-    const [g, all, latest] = await Promise.all([
+    const [g, all, latest, logs] = await Promise.all([
       getActiveGoal(),
       getAllWeightEntries(),
       getLatestWeightEntry(),
+      getDailyLogsBetween(WINDOW_START, WINDOW_END),
     ]);
     setGoal(g);
     setEntries(all);
     setLatestEntry(latest);
+    setDailyLogs(logs);
     setLoading(false);
     return g;
   }
@@ -46,9 +55,8 @@ export function WeightPage() {
     );
   }
 
-  const windowStart = addDays(todayISO(), -15);
-  const windowEnd = addDays(todayISO(), 15);
-  const series = buildWeightSeries(entries, goal, windowStart, windowEnd);
+  const series = buildWeightSeries(entries, goal, WINDOW_START, WINDOW_END, dailyLogs);
+  const selectedPoint = selectedDate ? series.find((p) => p.date === selectedDate) ?? null : null;
 
   return (
     <PageLayout
@@ -89,9 +97,11 @@ export function WeightPage() {
 
       <WeightSummaryCard latestEntry={latestEntry} goal={goal} />
 
-      <QuickWeightEntry onSaved={refresh} />
+      <DayEntryCard entries={entries} onSaved={refresh} />
 
-      <WeightChart series={series} hasGoal={goal !== null} />
+      <WeightChart series={series} hasGoal={goal !== null} onSelectDate={setSelectedDate} />
+
+      {selectedPoint && <DayDetailCard point={selectedPoint} onClose={() => setSelectedDate(null)} />}
     </PageLayout>
   );
 }
