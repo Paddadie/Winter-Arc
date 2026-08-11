@@ -27,6 +27,13 @@ export function nowTimeHHMM(): string {
   return `${hours}:${minutes}`;
 }
 
+/** "Aujourd'hui" / "Hier" / date longue (ex: "11 août"), pour un affichage relatif. */
+export function relativeDayLabel(iso: string): string {
+  if (iso === todayISO()) return "Aujourd'hui";
+  if (iso === addDays(todayISO(), -1)) return "Hier";
+  return new Date(iso).toLocaleDateString("fr-FR", { day: "numeric", month: "long" });
+}
+
 /** Nombre de jours entre deux dates ISO (b - a). */
 export function daysBetween(a: string, b: string): number {
   const [ay, am, ad] = a.split("-").map(Number);

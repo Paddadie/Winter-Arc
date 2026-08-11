@@ -11,6 +11,7 @@ import {
   Brush,
 } from "recharts";
 import { Card } from "../../components/Card";
+import { CardLabel } from "../../components/CardLabel";
 import { todayISO } from "../../utils/date";
 import { WeightDot, ChartTooltip, Legend, formatTick } from "./weightChartCommon";
 import type { WeightSeriesPoint } from "../../domain/weightSeries";
@@ -76,18 +77,7 @@ export function WeightHistoryChart({ series, hasGoal, onSelectDate, onVisibleRan
           margin: "0 var(--space-m) var(--space-s) var(--space-m)",
         }}
       >
-        <p
-          style={{
-            margin: 0,
-            fontSize: "13px",
-            fontWeight: 600,
-            color: "var(--color-ink-muted)",
-            textTransform: "uppercase",
-            letterSpacing: "0.03em",
-          }}
-        >
-          Historique
-        </p>
+        <CardLabel style={{ margin: 0 }}>Historique</CardLabel>
         {isZoomed && (
           <button
             onClick={resetZoom}

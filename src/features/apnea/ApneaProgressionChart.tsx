@@ -1,5 +1,6 @@
 import { ResponsiveContainer, ComposedChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 import { Card } from "../../components/Card";
+import { CardLabel } from "../../components/CardLabel";
 import { formatDuration } from "../../domain/apnea";
 import type { ApneaDailyPoint } from "../../domain/apnea";
 
@@ -16,18 +17,7 @@ interface ApneaProgressionChartProps {
 export function ApneaProgressionChart({ points }: ApneaProgressionChartProps) {
   return (
     <Card style={{ padding: "var(--space-m) var(--space-s)" }}>
-      <p
-        style={{
-          margin: "0 var(--space-m) var(--space-s) var(--space-m)",
-          fontSize: "13px",
-          fontWeight: 600,
-          color: "var(--color-ink-muted)",
-          textTransform: "uppercase",
-          letterSpacing: "0.03em",
-        }}
-      >
-        Progression
-      </p>
+      <CardLabel style={{ margin: "0 var(--space-m) var(--space-s) var(--space-m)" }}>Progression</CardLabel>
 
       {points.length === 0 ? (
         <p style={{ margin: "var(--space-l) var(--space-m)", color: "var(--color-ink-muted)", fontSize: "14px" }}>

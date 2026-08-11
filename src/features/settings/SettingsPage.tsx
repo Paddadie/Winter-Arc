@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { PageLayout } from "../../components/PageLayout";
 import { Card } from "../../components/Card";
+import { CardLabel } from "../../components/CardLabel";
 import { exportAllData, importAllData, isValidBackupData, type BackupData } from "../../db/backupRepo";
 import { todayISO } from "../../utils/date";
 
@@ -9,15 +10,18 @@ export function SettingsPage() {
   const [importError, setImportError] = useState<string | null>(null);
   const [importing, setImporting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const downloadLinkRef = useRef<HTMLAnchorElement>(null);
 
   async function handleExport() {
     const data = await exportAllData();
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `winter-arc-export-${todayISO()}.json`;
-    link.click();
+    const link = downloadLinkRef.current;
+    if (link) {
+      link.href = url;
+      link.download = `winter-arc-export-${todayISO()}.json`;
+      link.click();
+    }
     URL.revokeObjectURL(url);
     setExportFeedback(true);
     setTimeout(() => setExportFeedback(false), 2000);
@@ -68,18 +72,7 @@ export function SettingsPage() {
   return (
     <PageLayout title="Réglages" accentColor="var(--color-ink)">
       <Card>
-        <p
-          style={{
-            margin: "0 0 var(--space-s) 0",
-            fontSize: "13px",
-            fontWeight: 600,
-            color: "var(--color-ink-muted)",
-            textTransform: "uppercase",
-            letterSpacing: "0.03em",
-          }}
-        >
-          Sauvegarde
-        </p>
+        <CardLabel>Sauvegarde</CardLabel>
         <p style={{ margin: "0 0 var(--space-m) 0", fontSize: "14px", color: "var(--color-ink-muted)" }}>
           Aucune synchronisation automatique — exporte régulièrement tes données dans un fichier, à conserver où tu
           veux (mail, cloud personnel...).
@@ -105,21 +98,11 @@ export function SettingsPage() {
             ✓ Fichier téléchargé
           </p>
         )}
+        <a ref={downloadLinkRef} style={{ display: "none" }} />
       </Card>
 
       <Card>
-        <p
-          style={{
-            margin: "0 0 var(--space-s) 0",
-            fontSize: "13px",
-            fontWeight: 600,
-            color: "var(--color-ink-muted)",
-            textTransform: "uppercase",
-            letterSpacing: "0.03em",
-          }}
-        >
-          Restauration
-        </p>
+        <CardLabel>Restauration</CardLabel>
         <p style={{ margin: "0 0 var(--space-m) 0", fontSize: "14px", color: "var(--color-ink-muted)" }}>
           Importer un fichier remplace entièrement les données actuelles de l'appareil par celles du fichier.
         </p>

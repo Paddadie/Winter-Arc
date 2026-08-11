@@ -1,5 +1,6 @@
 import { Card } from "../../components/Card";
-import { todayISO } from "../../utils/date";
+import { StatBlock } from "./StatBlock";
+import { todayISO, relativeDayLabel } from "../../utils/date";
 import { remainingKg, daysRemaining } from "../../domain/weightTrajectory";
 import type { WeightEntry, WeightGoal } from "../../db/schema";
 
@@ -34,7 +35,7 @@ export function WeightSummaryCard({ latestEntry, goal }: WeightSummaryCardProps)
         {latestEntry ? formatKg(latestEntry.weightKg) : "—"}
       </p>
       <p style={{ margin: "4px 0 0 0", fontSize: "13px", color: "var(--color-ink-muted)" }}>
-        {latestEntry ? formatRelativeDate(latestEntry.date) : "Aucune pesée enregistrée"}
+        {latestEntry ? relativeDayLabel(latestEntry.date) : "Aucune pesée enregistrée"}
       </p>
 
       {goal ? (
@@ -47,14 +48,14 @@ export function WeightSummaryCard({ latestEntry, goal }: WeightSummaryCardProps)
             justifyContent: "space-between",
           }}
         >
-          <SummaryStat label="Objectif" value={formatKg(goal.targetWeightKg)} />
-          <SummaryStat
+          <StatBlock label="Objectif" value={formatKg(goal.targetWeightKg)} />
+          <StatBlock
             label="Restant"
             value={
               remaining !== null ? `${remaining > 0 ? "-" : "+"}${Math.abs(remaining).toFixed(1)} kg` : "—"
             }
           />
-          <SummaryStat label="Échéance" value={daysLeft !== null && daysLeft >= 0 ? `${daysLeft} j` : "dépassée"} />
+          <StatBlock label="Échéance" value={daysLeft !== null && daysLeft >= 0 ? `${daysLeft} j` : "dépassée"} />
         </div>
       ) : (
         <p
@@ -73,23 +74,7 @@ export function WeightSummaryCard({ latestEntry, goal }: WeightSummaryCardProps)
   );
 }
 
-function SummaryStat({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <p style={{ margin: 0, fontSize: "12px", color: "var(--color-ink-muted)", fontWeight: 600 }}>
-        {label}
-      </p>
-      <p style={{ margin: "2px 0 0 0", fontSize: "16px", fontWeight: 700 }}>{value}</p>
-    </div>
-  );
-}
-
 function formatKg(kg: number): string {
   return `${kg.toFixed(1).replace(".", ",")} kg`;
 }
 
-function formatRelativeDate(iso: string): string {
-  if (iso === todayISO()) return "Aujourd'hui";
-  const d = new Date(iso);
-  return d.toLocaleDateString("fr-FR", { day: "numeric", month: "long" });
-}

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Card } from "../../components/Card";
+import { CardLabel } from "../../components/CardLabel";
 import { addWeightEntry } from "../../db/weightRepo";
 import { getDailyLog, setDailyLog } from "../../db/dailyLogRepo";
 import { todayISO } from "../../utils/date";
@@ -78,18 +79,7 @@ export function DayEntryCard({ entries, onSaved }: DayEntryCardProps) {
 
   return (
     <Card>
-      <p
-        style={{
-          margin: 0,
-          fontSize: "13px",
-          fontWeight: 600,
-          color: "var(--color-ink-muted)",
-          textTransform: "uppercase",
-          letterSpacing: "0.03em",
-        }}
-      >
-        Suivi du jour
-      </p>
+      <CardLabel style={{ margin: 0 }}>Suivi du jour</CardLabel>
 
       <div style={{ marginTop: "6px" }}>
         {showDateEdit ? (

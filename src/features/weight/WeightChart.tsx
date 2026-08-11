@@ -10,6 +10,7 @@ import {
 } from "recharts";
 import { useNavigate } from "react-router-dom";
 import { Card } from "../../components/Card";
+import { CardLabel } from "../../components/CardLabel";
 import { todayISO } from "../../utils/date";
 import { WeightDot, ChartTooltip, Legend, formatTick } from "./weightChartCommon";
 import type { WeightSeriesPoint } from "../../domain/weightSeries";
@@ -30,18 +31,7 @@ export function WeightChart({ series, hasGoal, onSelectDate }: WeightChartProps)
 
   return (
     <Card style={{ padding: "var(--space-m) var(--space-s) var(--space-m) var(--space-xs)" }}>
-      <p
-        style={{
-          margin: "0 var(--space-m) var(--space-s) var(--space-m)",
-          fontSize: "13px",
-          fontWeight: 600,
-          color: "var(--color-ink-muted)",
-          textTransform: "uppercase",
-          letterSpacing: "0.03em",
-        }}
-      >
-        Évolution récente
-      </p>
+      <CardLabel style={{ margin: "0 var(--space-m) var(--space-s) var(--space-m)" }}>Évolution récente</CardLabel>
 
       {!hasAnyWeight ? (
         <p style={{ margin: "var(--space-l) var(--space-m)", color: "var(--color-ink-muted)", fontSize: "14px" }}>

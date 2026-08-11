@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { PageLayout } from "../../components/PageLayout";
 import { Card } from "../../components/Card";
+import { StatBlock } from "./StatBlock";
 import { WeightHistoryChart } from "./WeightHistoryChart";
 import { DayDetailCard } from "./DayDetailCard";
 import { getActiveGoal } from "../../db/goalRepo";
@@ -93,27 +94,16 @@ function PeriodStats({ series }: { series: WeightSeriesPoint[] }) {
         Du {formatShortDate(series[0].date)} au {formatShortDate(series[series.length - 1].date)}
       </p>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-m)" }}>
-        <Stat label="Début" value={formatKg(startWeight)} />
-        <Stat label="Fin" value={formatKg(endWeight)} />
-        <Stat
+        <StatBlock label="Début" value={formatKg(startWeight)} />
+        <StatBlock label="Fin" value={formatKg(endWeight)} />
+        <StatBlock
           label="Variation"
           value={`${variation > 0 ? "+" : ""}${variation.toFixed(1).replace(".", ",")} kg`}
           color={variation > 0 ? "var(--color-alert)" : "var(--color-success)"}
         />
-        <Stat label="Min – Max" value={`${formatKg(minWeight)} – ${formatKg(maxWeight)}`} />
+        <StatBlock label="Min – Max" value={`${formatKg(minWeight)} – ${formatKg(maxWeight)}`} />
       </div>
     </Card>
-  );
-}
-
-function Stat({ label, value, color }: { label: string; value: string; color?: string }) {
-  return (
-    <div>
-      <p style={{ margin: 0, fontSize: "12px", color: "var(--color-ink-muted)", fontWeight: 600 }}>{label}</p>
-      <p style={{ margin: "2px 0 0 0", fontSize: "16px", fontWeight: 700, color: color ?? "var(--color-ink)" }}>
-        {value}
-      </p>
-    </div>
   );
 }
 

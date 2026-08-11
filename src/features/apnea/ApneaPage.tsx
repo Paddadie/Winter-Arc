@@ -2,11 +2,12 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PageLayout } from "../../components/PageLayout";
 import { Card } from "../../components/Card";
+import { CardLabel } from "../../components/CardLabel";
 import { BottomSheet } from "../../components/BottomSheet";
 import { addApneaSession, getRecentApneaSessions } from "../../db/apneaRepo";
 import { formatDuration, formatDurationWithMs, averageDuration, computeWindowStats } from "../../domain/apnea";
 import type { ApneaWindowStats } from "../../domain/apnea";
-import { todayISO, addDays, nowTimeHHMM } from "../../utils/date";
+import { todayISO, addDays, nowTimeHHMM, relativeDayLabel } from "../../utils/date";
 import type { ApneaSession } from "../../db/schema";
 
 const STATS_WINDOW_DAYS = 10;
@@ -126,18 +127,7 @@ export function ApneaPage() {
       </Card>
 
       <Card>
-        <p
-          style={{
-            margin: "0 0 var(--space-s) 0",
-            fontSize: "13px",
-            fontWeight: 600,
-            color: "var(--color-ink-muted)",
-            textTransform: "uppercase",
-            letterSpacing: "0.03em",
-          }}
-        >
-          Aujourd'hui
-        </p>
+        <CardLabel>Aujourd'hui</CardLabel>
 
         {todaySessions.length === 0 ? (
           <p style={{ margin: 0, fontSize: "14px", color: "var(--color-ink-muted)" }}>
@@ -183,19 +173,7 @@ function WindowStatsCard({ stats }: { stats: ApneaWindowStats | null }) {
   return (
     <Card style={{ textAlign: "center" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <p
-          style={{
-            margin: "0 0 var(--space-s) 0",
-            fontSize: "13px",
-            fontWeight: 600,
-            color: "var(--color-ink-muted)",
-            textTransform: "uppercase",
-            letterSpacing: "0.03em",
-            textAlign: "left",
-          }}
-        >
-          {STATS_WINDOW_DAYS} derniers jours
-        </p>
+        <CardLabel style={{ textAlign: "left" }}>{STATS_WINDOW_DAYS} derniers jours</CardLabel>
         <button
           onClick={() => setShowInfo(true)}
           aria-label="En savoir plus sur ces statistiques"
@@ -348,18 +326,7 @@ function RecentPerformancesCard({ sessions }: { sessions: ApneaSession[] }) {
 
   return (
     <Card>
-      <p
-        style={{
-          margin: "0 0 var(--space-s) 0",
-          fontSize: "13px",
-          fontWeight: 600,
-          color: "var(--color-ink-muted)",
-          textTransform: "uppercase",
-          letterSpacing: "0.03em",
-        }}
-      >
-        Performances récentes
-      </p>
+      <CardLabel>Performances récentes</CardLabel>
 
       {shownDates.length === 0 ? (
         <p style={{ margin: 0, fontSize: "14px", color: "var(--color-ink-muted)" }}>
@@ -380,7 +347,7 @@ function RecentPerformancesCard({ sessions }: { sessions: ApneaSession[] }) {
                   borderTop: i === 0 ? "none" : "1px solid var(--color-border)",
                 }}
               >
-                <span>{dayLabel(date)}</span>
+                <span>{relativeDayLabel(date)}</span>
                 <span style={{ fontWeight: 600 }}>{formatDuration(avg)}</span>
               </div>
             );
@@ -404,11 +371,6 @@ function RecentPerformancesCard({ sessions }: { sessions: ApneaSession[] }) {
       </button>
     </Card>
   );
-}
-
-function dayLabel(iso: string): string {
-  if (iso === addDays(todayISO(), -1)) return "Hier";
-  return new Date(iso).toLocaleDateString("fr-FR", { day: "numeric", month: "long" });
 }
 
 function TimerButton({

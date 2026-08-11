@@ -4,7 +4,7 @@ import { Card } from "../../components/Card";
 import { ApneaProgressionChart } from "./ApneaProgressionChart";
 import { deleteApneaSession, getAllApneaSessions } from "../../db/apneaRepo";
 import { formatDuration, groupDailyAverages } from "../../domain/apnea";
-import { todayISO, addDays } from "../../utils/date";
+import { todayISO, addDays, relativeDayLabel } from "../../utils/date";
 import type { ApneaSession } from "../../db/schema";
 
 type Period = "7j" | "30j" | "tout";
@@ -31,7 +31,7 @@ export function ApneaHistoryPage() {
 
   async function handleDelete(session: ApneaSession) {
     const confirmed = window.confirm(
-      `Supprimer la mesure du ${formatFullDate(session.date)} (${formatDuration(session.durationSec)}) ?`
+      `Supprimer la mesure du ${relativeDayLabel(session.date)} (${formatDuration(session.durationSec)}) ?`
     );
     if (!confirmed) return;
     await deleteApneaSession(session.id!);
@@ -95,7 +95,7 @@ export function ApneaHistoryPage() {
                   borderTop: i === 0 ? "none" : "1px solid var(--color-border)",
                 }}
               >
-                <span style={{ flex: 1, fontSize: "14px" }}>{formatFullDate(session.date)}</span>
+                <span style={{ flex: 1, fontSize: "14px" }}>{relativeDayLabel(session.date)}</span>
                 <span style={{ width: "48px", fontSize: "14px", color: "var(--color-ink-muted)" }}>
                   {session.time ?? "—"}
                 </span>
@@ -122,10 +122,4 @@ export function ApneaHistoryPage() {
       </Card>
     </PageLayout>
   );
-}
-
-function formatFullDate(iso: string): string {
-  if (iso === todayISO()) return "Aujourd'hui";
-  if (iso === addDays(todayISO(), -1)) return "Hier";
-  return new Date(iso).toLocaleDateString("fr-FR", { day: "numeric", month: "long" });
 }
