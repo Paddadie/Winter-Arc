@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { featureTiles } from "./features.config";
 import { Tile } from "./Tile";
+import { TodayChecklist } from "./TodayChecklist";
 import "./HomePage.css";
 
 export function HomePage() {
@@ -17,6 +18,8 @@ export function HomePage() {
           ⚙️
         </button>
       </div>
+
+      <TodayChecklist />
 
       <div className="home-tiles">
         {featureTiles.map((tile) => (
