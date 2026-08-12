@@ -3,7 +3,7 @@ import { PageLayout } from "../../components/PageLayout";
 import { Card } from "../../components/Card";
 import { ApneaProgressionChart } from "./ApneaProgressionChart";
 import { deleteApneaSession, getAllApneaSessions } from "../../db/apneaRepo";
-import { formatDuration, groupDailyAverages } from "../../domain/apnea";
+import { formatDuration, groupDailyBest } from "../../domain/apnea";
 import { todayISO, addDays, relativeDayLabel } from "../../utils/date";
 import type { ApneaSession } from "../../db/schema";
 import "./ApneaHistoryPage.css";
@@ -51,7 +51,7 @@ export function ApneaHistoryPage() {
   // sessions est déjà trié par date décroissante (getAllApneaSessions) : pratique pour le tableau.
   const filtered = cutoff === null ? sessions : sessions.filter((s) => s.date >= cutoff);
   const chronological = [...filtered].reverse();
-  const dailyPoints = groupDailyAverages(chronological);
+  const dailyPoints = groupDailyBest(chronological);
 
   return (
     <PageLayout title="Historique" accentColor="var(--color-teal)" backTo="/apnee" backLabel="Apnée">

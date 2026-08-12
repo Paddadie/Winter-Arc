@@ -5,7 +5,7 @@ import { Card } from "../../components/Card";
 import { CardLabel } from "../../components/CardLabel";
 import { BottomSheet } from "../../components/BottomSheet";
 import { addApneaSession, getRecentApneaSessions } from "../../db/apneaRepo";
-import { formatDuration, formatDurationWithMs, averageDuration, computeWindowStats } from "../../domain/apnea";
+import { formatDuration, formatDurationWithMs, computeWindowStats } from "../../domain/apnea";
 import type { ApneaWindowStats } from "../../domain/apnea";
 import { todayISO, addDays, nowTimeHHMM, relativeDayLabel } from "../../utils/date";
 import type { ApneaSession } from "../../db/schema";
@@ -84,7 +84,7 @@ export function ApneaPage() {
     await refreshSessions();
   }
 
-  const todayAverage = averageDuration(todaySessions.map((s) => s.durationSec));
+  const todayBest = todaySessions.length > 0 ? Math.max(...todaySessions.map((s) => s.durationSec)) : null;
 
   return (
     <PageLayout title="Apnée" accentColor="var(--color-teal)">
@@ -118,9 +118,9 @@ export function ApneaPage() {
           <p className="empty-message">Aucune mesure enregistrée aujourd'hui.</p>
         ) : (
           <>
-            {todayAverage !== null && todaySessions.length > 1 && (
+            {todayBest !== null && todaySessions.length > 1 && (
               <p className="apnea-today-average">
-                Moyenne du jour : <strong>{formatDuration(todayAverage)}</strong>
+                Meilleure du jour : <strong>{formatDuration(todayBest)}</strong>
               </p>
             )}
             <div className="apnea-today-list">
@@ -253,11 +253,11 @@ function RecentPerformancesCard({ sessions }: { sessions: ApneaSession[] }) {
       ) : (
         <div className="apnea-recent-list">
           {shownDates.map((date, i) => {
-            const avg = averageDuration(sessions.filter((s) => s.date === date).map((s) => s.durationSec))!;
+            const best = Math.max(...sessions.filter((s) => s.date === date).map((s) => s.durationSec));
             return (
               <div key={date} className={`apnea-recent-row ${i === 0 ? "apnea-recent-row--first" : ""}`}>
                 <span>{relativeDayLabel(date)}</span>
-                <span className="apnea-recent-duration">{formatDuration(avg)}</span>
+                <span className="apnea-recent-duration">{formatDuration(best)}</span>
               </div>
             );
           })}
