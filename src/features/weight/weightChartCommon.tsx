@@ -25,19 +25,20 @@ export function WeightDot(props: { cx?: number; cy?: number; payload?: WeightSer
       ) : (
         <circle cx={cx} cy={cy} r={3} fill="var(--color-surface-raised)" stroke="var(--color-coral)" strokeWidth={1.5} />
       )}
-      <DayMarker cx={cx} cy={cy + 9} shown={payload.foodDeviation === true} color="var(--color-alert)" />
-      <DayMarker cx={cx} cy={cy + 19} shown={payload.sport === true} color="var(--color-success)" />
+      <DayMarker cx={cx} cy={cy - 9} shown={payload.foodDeviation === true} color="var(--color-alert)" />
+      <DayMarker cx={cx} cy={cy + 9} shown={payload.sport === true} color="var(--color-success)" />
     </g>
   );
 }
 
 /**
- * Une pastille sport/écart, empilée verticalement sous le point (écart en
- * haut, sport en bas) pour rester lisible sur un écran étroit. Rien n'est
- * dessiné si la valeur n'est pas "oui" — ni pour "non", ni pour "non
- * renseigné" — afin de garder le graphique épuré : seul un jour marquant
- * (sport fait / écart constaté) laisse une trace visuelle. Le détail
- * complet des trois états reste disponible dans la fiche du jour.
+ * Une pastille sport/écart, positionnée verticalement par rapport au point
+ * (écart au-dessus de la courbe, sport en dessous) pour rester lisible sur
+ * un écran étroit. Rien n'est dessiné si la valeur n'est pas "oui" — ni
+ * pour "non", ni pour "non renseigné" — afin de garder le graphique épuré :
+ * seul un jour marquant (sport fait / écart constaté) laisse une trace
+ * visuelle. Le détail complet des trois états reste disponible dans la
+ * fiche du jour.
  */
 function DayMarker({ cx, cy, shown, color }: { cx: number; cy: number; shown: boolean; color: string }) {
   if (!shown) return null;

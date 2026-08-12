@@ -79,22 +79,24 @@ export function WeightHistoryChart({ series, hasGoal, onSelectDate, onVisibleRan
 
       <div className="weight-history-canvas">
         <ResponsiveContainer>
-          <ComposedChart data={series} margin={{ top: 8, right: 12, bottom: 22, left: -12 }} onClick={handleChartClick}>
+          <ComposedChart data={series} margin={{ top: 20, right: 16, bottom: 14, left: 0 }} onClick={handleChartClick}>
             <CartesianGrid stroke="var(--color-border)" vertical={false} />
             <XAxis
               dataKey="date"
               tickFormatter={formatTick}
               interval={tickInterval}
+              padding={{ left: 12, right: 12 }}
               tick={{ fontSize: 11, fill: "var(--color-ink-muted)" }}
               axisLine={{ stroke: "var(--color-border)" }}
               tickLine={false}
             />
             <YAxis
               domain={["dataMin - 1", "dataMax + 1"]}
+              allowDecimals={false}
               tick={{ fontSize: 11, fill: "var(--color-ink-muted)" }}
               axisLine={false}
               tickLine={false}
-              width={34}
+              width={40}
             />
             <Tooltip content={<ChartTooltip />} />
             <ReferenceLine x={todayISO()} stroke="var(--color-ink-muted)" strokeDasharray="3 3" />

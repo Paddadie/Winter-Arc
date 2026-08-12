@@ -25,6 +25,13 @@ interface WeightChartProps {
 export function WeightChart({ series, hasGoal, onSelectDate }: WeightChartProps) {
   const navigate = useNavigate();
   const hasAnyWeight = series.some((p) => p.weightKg !== null);
+  // Dernier poids connu (réel ou estimé) : sert d'ancre pour une échelle Y
+  // resserrée autour de la valeur actuelle plutôt qu'un dataMin/dataMax
+  // auto-calculé, qui peut produire des graduations à virgule difficiles à
+  // lire sur un axe étroit.
+  const referenceWeight = [...series].reverse().find((p) => p.weightKg !== null)?.weightKg ?? null;
+  const yDomain: [number | string, number | string] =
+    referenceWeight !== null ? [referenceWeight - 1.5, referenceWeight + 3] : ["dataMin - 1", "dataMax + 1"];
 
   function handleChartClick(state: { activeLabel?: string | number } | null) {
     if (state?.activeLabel != null) onSelectDate(String(state.activeLabel));
@@ -41,7 +48,7 @@ export function WeightChart({ series, hasGoal, onSelectDate }: WeightChartProps)
           <ResponsiveContainer>
             <ComposedChart
               data={series}
-              margin={{ top: 8, right: 12, bottom: 22, left: -12 }}
+              margin={{ top: 20, right: 16, bottom: 14, left: 0 }}
               onClick={handleChartClick}
             >
               <CartesianGrid stroke="var(--color-border)" vertical={false} />
@@ -49,16 +56,18 @@ export function WeightChart({ series, hasGoal, onSelectDate }: WeightChartProps)
                 dataKey="date"
                 tickFormatter={formatTick}
                 interval={4}
+                padding={{ left: 12, right: 12 }}
                 tick={{ fontSize: 11, fill: "var(--color-ink-muted)" }}
                 axisLine={{ stroke: "var(--color-border)" }}
                 tickLine={false}
               />
               <YAxis
-                domain={["dataMin - 1", "dataMax + 1"]}
+                domain={yDomain}
+                allowDecimals={false}
                 tick={{ fontSize: 11, fill: "var(--color-ink-muted)" }}
                 axisLine={false}
                 tickLine={false}
-                width={34}
+                width={40}
               />
               <Tooltip content={<ChartTooltip />} />
               <ReferenceLine x={todayISO()} stroke="var(--color-ink-muted)" strokeDasharray="3 3" />
