@@ -1,0 +1,33 @@
+.streak-section + .streak-section {
+  margin-top: var(--space-m);
+}
+
+.streak-label {
+  margin: 0 0 6px 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-ink-muted);
+}
+
+.streak-cells {
+  display: grid;
+  grid-template-columns: repeat(15, 1fr);
+  gap: 4px;
+}
+
+.streak-cell {
+  aspect-ratio: 1;
+  border-radius: 4px;
+  border: 1.5px solid var(--color-border);
+  background: transparent;
+}
+
+.streak-cell--coral {
+  border-color: var(--color-coral);
+  background: var(--color-coral);
+}
+
+.streak-cell--teal {
+  border-color: var(--color-teal);
+  background: var(--color-teal);
+}

@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { featureTiles } from "./features.config";
 import { Tile } from "./Tile";
 import { TodayChecklist } from "./TodayChecklist";
+import { StreakGrid } from "./StreakGrid";
 import "./HomePage.css";
 
 export function HomePage() {
@@ -20,6 +21,8 @@ export function HomePage() {
       </div>
 
       <TodayChecklist />
+
+      <StreakGrid />
 
       <div className="home-tiles">
         {featureTiles.map((tile) => (
