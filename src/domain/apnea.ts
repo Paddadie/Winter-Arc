@@ -15,13 +15,6 @@ export function formatDurationWithMs(totalMs: number): string {
   return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}:${String(centis).padStart(2, "0")}`;
 }
 
-/** Moyenne (arrondie à la seconde) d'une liste de durées, ou null si vide. */
-export function averageDuration(durationsSec: number[]): number | null {
-  if (durationsSec.length === 0) return null;
-  const total = durationsSec.reduce((sum, d) => sum + d, 0);
-  return Math.round(total / durationsSec.length);
-}
-
 export interface ApneaDailyPoint {
   date: string;
   durationSec: number;
@@ -70,4 +63,11 @@ export function computeWindowStats(sessions: ApneaSession[]): ApneaWindowStats |
     worst: { durationSec: worst.durationSec, date: worst.date },
     best: { durationSec: best.durationSec, date: best.date },
   };
+
+/** Moyenne (arrondie à la seconde) d'une liste de durées, ou null si vide. */
+function averageDuration(durationsSec: number[]): number | null {
+  if (durationsSec.length === 0) return null;
+  const total = durationsSec.reduce((sum, d) => sum + d, 0);
+  return Math.round(total / durationsSec.length);
+}
 }

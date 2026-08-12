@@ -10,10 +10,6 @@ export async function addWeightEntry(date: string, weightKg: number): Promise<vo
   }
 }
 
-export async function deleteWeightEntry(id: number): Promise<void> {
-  await db.weightEntries.delete(id);
-}
-
 /** Toutes les entrées, triées par date croissante. */
 export async function getAllWeightEntries(): Promise<WeightEntry[]> {
   return db.weightEntries.orderBy("date").toArray();
