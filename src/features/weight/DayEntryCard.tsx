@@ -4,6 +4,7 @@ import { CardLabel } from "../../components/CardLabel";
 import { addWeightEntry } from "../../db/weightRepo";
 import { getDailyLog, setDailyLog } from "../../db/dailyLogRepo";
 import { todayISO } from "../../utils/date";
+import { isPeriodTrackingEnabled } from "./periodTrackingPref";
 import type { WeightEntry } from "../../db/schema";
 import "./DayEntryCard.css";
 
@@ -30,6 +31,8 @@ export function DayEntryCard({ entries, onSaved }: DayEntryCardProps) {
 
   const [sport, setSport] = useState(false);
   const [foodDeviation, setFoodDeviation] = useState(false);
+  const [period, setPeriod] = useState(false);
+  const periodTrackingEnabled = isPeriodTrackingEnabled();
 
   // Recharge le poids (depuis les entrées déjà en mémoire) et le journal
   // (depuis la base) à chaque changement de date, pour éditer ce jour-là.
@@ -42,6 +45,7 @@ export function DayEntryCard({ entries, onSaved }: DayEntryCardProps) {
     getDailyLog(date).then((log) => {
       setSport(log?.sport ?? false);
       setFoodDeviation(log?.foodDeviation ?? false);
+      setPeriod(log?.period ?? false);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [date]);
@@ -75,6 +79,13 @@ export function DayEntryCard({ entries, onSaved }: DayEntryCardProps) {
     const next = !foodDeviation;
     setFoodDeviation(next);
     await setDailyLog(date, { foodDeviation: next });
+    onSaved();
+  }
+
+  async function togglePeriod() {
+    const next = !period;
+    setPeriod(next);
+    await setDailyLog(date, { period: next });
     onSaved();
   }
 
@@ -125,6 +136,9 @@ export function DayEntryCard({ entries, onSaved }: DayEntryCardProps) {
       <div className="day-entry-chips-row">
         <Chip label="🏃 Sport" active={sport} variant="success" onClick={toggleSport} />
         <Chip label="🍔 Écart" active={foodDeviation} variant="alert" onClick={toggleFoodDeviation} />
+        {periodTrackingEnabled && (
+          <Chip label="🌸 Cycle" active={period} variant="period" onClick={togglePeriod} />
+        )}
       </div>
     </Card>
   );
@@ -138,7 +152,7 @@ function Chip({
 }: {
   label: string;
   active: boolean;
-  variant: "success" | "alert";
+  variant: "success" | "alert" | "period";
   onClick: () => void;
 }) {
   return (

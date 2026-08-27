@@ -6,6 +6,7 @@ import { exportAllData, importAllData, isValidBackupData, type BackupData } from
 import { todayISO } from "../../utils/date";
 import { featureTiles } from "../home/features.config";
 import { getHiddenTileIds, setTileHidden } from "../home/tileVisibility";
+import { isPeriodTrackingEnabled, setPeriodTrackingEnabled } from "../weight/periodTrackingPref";
 import "./SettingsPage.css";
 
 export function SettingsPage() {
@@ -13,12 +14,19 @@ export function SettingsPage() {
   const [importError, setImportError] = useState<string | null>(null);
   const [importing, setImporting] = useState(false);
   const [hiddenTileIds, setHiddenTileIds] = useState(() => getHiddenTileIds());
+  const [periodTrackingEnabled, setPeriodTrackingEnabledState] = useState(() => isPeriodTrackingEnabled());
   const fileInputRef = useRef<HTMLInputElement>(null);
   const downloadLinkRef = useRef<HTMLAnchorElement>(null);
 
   function handleToggleTile(id: string) {
     setTileHidden(id, !hiddenTileIds.has(id));
     setHiddenTileIds(getHiddenTileIds());
+  }
+
+  function handleTogglePeriodTracking() {
+    const next = !periodTrackingEnabled;
+    setPeriodTrackingEnabled(next);
+    setPeriodTrackingEnabledState(next);
   }
 
   async function handleExport() {
@@ -99,6 +107,23 @@ export function SettingsPage() {
             </label>
           ))}
         </div>
+      </Card>
+
+      <Card>
+        <CardLabel>Suivi du cycle</CardLabel>
+        <p className="settings-description">
+          Ajoute un bouton "🌸 Cycle" dans le suivi du jour de Régime, et repère ces jours sur le graphique de poids.
+        </p>
+        <label className="settings-tile-row">
+          <input
+            type="checkbox"
+            checked={periodTrackingEnabled}
+            onChange={handleTogglePeriodTracking}
+            className="settings-tile-checkbox"
+          />
+          <span className="settings-tile-icon">🌸</span>
+          <span>Activer le suivi du cycle</span>
+        </label>
       </Card>
 
       <Card>

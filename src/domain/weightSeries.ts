@@ -10,6 +10,8 @@ export interface WeightSeriesPoint {
   /** null = aucun journal saisi ce jour-là (distinct de "saisi comme non fait") */
   sport: boolean | null;
   foodDeviation: boolean | null;
+  /** Suivi du cycle, si la fonctionnalité est activée dans les réglages. */
+  period: boolean | null;
 }
 
 /**
@@ -71,6 +73,7 @@ export function buildWeightSeries(
       goalWeightKg,
       sport: log ? log.sport : null,
       foodDeviation: log ? log.foodDeviation : null,
+      period: log ? (log.period ?? null) : null,
     });
     date = addDays(date, 1);
   }

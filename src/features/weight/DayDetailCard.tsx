@@ -1,5 +1,6 @@
 import { Card } from "../../components/Card";
 import { BottomSheet } from "../../components/BottomSheet";
+import { isPeriodTrackingEnabled } from "./periodTrackingPref";
 import type { WeightSeriesPoint } from "../../domain/weightSeries";
 import "./DayDetailCard.css";
 
@@ -49,13 +50,28 @@ export function DayDetailCard({ point, onClose }: DayDetailCardProps) {
             value={point.foodDeviation === null ? "Non renseigné" : point.foodDeviation ? "Oui" : "Non"}
             variant={point.foodDeviation ? "alert" : undefined}
           />
+          {isPeriodTrackingEnabled() && (
+            <DetailRow
+              label="Cycle"
+              value={point.period === null ? "Non renseigné" : point.period ? "Oui" : "Non"}
+              variant={point.period ? "period" : undefined}
+            />
+          )}
         </Card>
       )}
     </BottomSheet>
   );
 }
 
-function DetailRow({ label, value, variant }: { label: string; value: string; variant?: "success" | "alert" }) {
+function DetailRow({
+  label,
+  value,
+  variant,
+}: {
+  label: string;
+  value: string;
+  variant?: "success" | "alert" | "period";
+}) {
   return (
     <div className="detail-row">
       <span className="detail-row-label">{label}</span>

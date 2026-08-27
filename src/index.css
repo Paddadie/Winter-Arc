@@ -19,6 +19,10 @@
   --color-success: #3F8F5F;        /* jour de sport */
   --color-alert: #C9483A;          /* écart alimentaire / pire perf */
 
+  --color-period: #C2255C;         /* accent suivi du cycle (optionnel) */
+  --color-period-soft: #FBE7EF;
+  --color-period-weekend: #E9D6ED; /* jour à la fois week-end et cycle : lavande douce, cohérente avec les autres teintes pastel */
+
   /* Typographie — SF Pro (système iOS), Rounded pour les chiffres héros */
   --font-body: -apple-system, "SF Pro Text", system-ui, sans-serif;
   --font-display: ui-rounded, "SF Pro Rounded", -apple-system, system-ui, sans-serif;
@@ -83,6 +87,10 @@ button {
 
 .text-alert {
   color: var(--color-alert);
+}
+
+.text-period {
+  color: var(--color-period);
 }
 
 .empty-message {

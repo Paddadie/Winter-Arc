@@ -13,7 +13,8 @@ import {
 import { Card } from "../../components/Card";
 import { CardLabel } from "../../components/CardLabel";
 import { todayISO } from "../../utils/date";
-import { WeightDot, ChartTooltip, Legend, WeekendAreas, formatTick } from "./weightChartCommon";
+import { WeightDot, ChartTooltip, Legend, DayHighlights, formatTick } from "./weightChartCommon";
+import { isPeriodTrackingEnabled } from "./periodTrackingPref";
 import type { WeightSeriesPoint } from "../../domain/weightSeries";
 import "./WeightHistoryChart.css";
 
@@ -79,8 +80,13 @@ export function WeightHistoryChart({ series, hasGoal, onSelectDate, onVisibleRan
 
       <div className="weight-history-canvas">
         <ResponsiveContainer>
-          <ComposedChart data={series} margin={{ top: 20, right: 16, bottom: 14, left: 0 }} onClick={handleChartClick}>
-            <WeekendAreas series={series} />
+          <ComposedChart
+            data={series}
+            margin={{ top: 20, right: 16, bottom: 14, left: 0 }}
+            onClick={handleChartClick}
+            barCategoryGap={0}
+          >
+            <DayHighlights series={series} showPeriod={isPeriodTrackingEnabled()} />
             <CartesianGrid stroke="var(--color-border)" vertical={false} />
             <XAxis
               dataKey="date"
@@ -142,7 +148,7 @@ export function WeightHistoryChart({ series, hasGoal, onSelectDate, onVisibleRan
         </ResponsiveContainer>
       </div>
 
-      <Legend hasGoal={hasGoal} />
+      <Legend hasGoal={hasGoal} showPeriod={isPeriodTrackingEnabled()} />
     </Card>
   );
 }

@@ -1,4 +1,4 @@
-import { ReferenceArea } from "recharts";
+import { Bar, Cell, YAxis } from "recharts";
 import { isWeekend } from "../../utils/date";
 import type { WeightSeriesPoint } from "../../domain/weightSeries";
 import "../../components/chartTooltip.css";
@@ -48,33 +48,40 @@ function DayMarker({ cx, cy, shown, color }: { cx: number; cy: number; shown: bo
 }
 
 /**
- * Fond bleu clair derrière les jours de week-end, pour les repérer d'un
- * coup d'œil sur le graphique. Regroupe les jours de week-end consécutifs
- * (samedi+dimanche) en une seule zone plutôt que deux, pour un rendu propre.
- * À placer en premier enfant du graphique pour rester derrière la grille
- * et les courbes.
+ * Fond coloré derrière certains jours (week-ends en bleu clair, jours de
+ * cycle en rose si activé) pour les repérer d'un coup d'œil sur le
+ * graphique. Techniquement une barre pleine hauteur par jour (sur un axe Y
+ * caché dédié, indépendant de l'échelle des poids), rendue transparente les
+ * jours sans marquage — un <Bar> Recharts est, contrairement à
+ * <ReferenceArea>, automatiquement centré et dimensionné sur son propre
+ * jour, même isolé (une seule <ReferenceArea> entre deux dates identiques
+ * a une largeur nulle et ne s'affichait pas ; une plage de plusieurs jours
+ * plaçait aussi les points sur le bord de la zone plutôt qu'au centre).
+ * Recharts dessine toujours CartesianGrid en arrière-plan et les <Bar> par
+ * dessus, quel que soit leur ordre dans le JSX : `fillOpacity` laisse donc
+ * volontairement transparaître les lignes de la grille (poids entiers,
+ * ex: 83, 85 kg) à travers la couleur plutôt que de les recouvrir.
  */
-export function WeekendAreas({ series }: { series: WeightSeriesPoint[] }) {
-  const ranges: Array<{ start: string; end: string }> = [];
-  let current: { start: string; end: string } | null = null;
-
-  for (const point of series) {
-    if (isWeekend(point.date)) {
-      current = current ? { start: current.start, end: point.date } : { start: point.date, end: point.date };
-    } else if (current) {
-      ranges.push(current);
-      current = null;
-    }
-  }
-  if (current) ranges.push(current);
-
+export function DayHighlights({ series, showPeriod }: { series: WeightSeriesPoint[]; showPeriod: boolean }) {
   return (
     <>
-      {ranges.map((range) => (
-        <ReferenceArea key={range.start} x1={range.start} x2={range.end} fill="var(--color-teal-soft)" fillOpacity={0.6} />
-      ))}
+      <YAxis yAxisId="highlight" domain={[0, 1]} hide />
+      <Bar yAxisId="highlight" dataKey={() => 1} stroke="none" fillOpacity={0.6} isAnimationActive={false}>
+        {series.map((point) => (
+          <Cell key={point.date} fill={dayHighlightColor(point, showPeriod)} />
+        ))}
+      </Bar>
     </>
   );
+}
+
+function dayHighlightColor(point: WeightSeriesPoint, showPeriod: boolean): string {
+  const isPeriodDay = showPeriod && point.period === true;
+  const isWeekendDay = isWeekend(point.date);
+  if (isPeriodDay && isWeekendDay) return "var(--color-period-weekend)";
+  if (isPeriodDay) return "var(--color-period-soft)";
+  if (isWeekendDay) return "var(--color-teal-soft)";
+  return "transparent";
 }
 
 export function ChartTooltip({
@@ -104,7 +111,7 @@ export function ChartTooltip({
   );
 }
 
-export function Legend({ hasGoal }: { hasGoal: boolean }) {
+export function Legend({ hasGoal, showPeriod }: { hasGoal: boolean; showPeriod?: boolean }) {
   return (
     <div className="chart-legend">
       <LegendItem color="var(--color-coral)" label="Mesuré" filled />
@@ -112,6 +119,7 @@ export function Legend({ hasGoal }: { hasGoal: boolean }) {
       {hasGoal && <LegendItem color="var(--color-depth)" label="Objectif" dashed />}
       <LegendItem color="var(--color-success)" label="Sport" filled />
       <LegendItem color="var(--color-alert)" label="Écart" filled />
+      {showPeriod && <LegendItem color="var(--color-period)" label="Cycle" area />}
     </div>
   );
 }
@@ -121,17 +129,23 @@ function LegendItem({
   label,
   filled,
   dashed,
+  area,
 }: {
   color: string;
   label: string;
   filled?: boolean;
   dashed?: boolean;
+  area?: boolean;
 }) {
   return (
     <span className="chart-legend-item">
       {dashed ? (
         <svg width="14" height="8">
           <line x1="0" y1="4" x2="14" y2="4" stroke={color} strokeWidth="2" strokeDasharray="4 3" />
+        </svg>
+      ) : area ? (
+        <svg width="10" height="10">
+          <rect x="0" y="0" width="10" height="10" rx="2" fill={color} fillOpacity="0.7" />
         </svg>
       ) : (
         <svg width="10" height="10">

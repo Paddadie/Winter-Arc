@@ -12,7 +12,8 @@ import { useNavigate } from "react-router-dom";
 import { Card } from "../../components/Card";
 import { CardLabel } from "../../components/CardLabel";
 import { todayISO } from "../../utils/date";
-import { WeightDot, ChartTooltip, Legend, WeekendAreas, formatTick } from "./weightChartCommon";
+import { WeightDot, ChartTooltip, Legend, DayHighlights, formatTick } from "./weightChartCommon";
+import { isPeriodTrackingEnabled } from "./periodTrackingPref";
 import type { WeightSeriesPoint } from "../../domain/weightSeries";
 import "./WeightChart.css";
 
@@ -50,8 +51,9 @@ export function WeightChart({ series, hasGoal, onSelectDate }: WeightChartProps)
               data={series}
               margin={{ top: 20, right: 16, bottom: 14, left: 0 }}
               onClick={handleChartClick}
+              barCategoryGap={0}
             >
-              <WeekendAreas series={series} />
+              <DayHighlights series={series} showPeriod={isPeriodTrackingEnabled()} />
               <CartesianGrid stroke="var(--color-border)" vertical={false} />
               <XAxis
                 dataKey="date"
@@ -102,7 +104,7 @@ export function WeightChart({ series, hasGoal, onSelectDate }: WeightChartProps)
         </div>
       )}
 
-      <Legend hasGoal={hasGoal} />
+      <Legend hasGoal={hasGoal} showPeriod={isPeriodTrackingEnabled()} />
 
       <button onClick={() => navigate("/regime/historique")} className="weight-chart-history-link">
         Historique →

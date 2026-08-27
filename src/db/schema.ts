@@ -13,12 +13,19 @@ export interface WeightEntry {
 /**
  * Informations quotidiennes simples : sport fait ou non, écart alimentaire ou non.
  * Une seule entrée par jour (upsert sur `date`).
+ *
+ * `period` (suivi du cycle) est optionnel et non indexé : ajouté après coup
+ * sans bump de version Dexie, puisque Dexie ne contraint que les champs
+ * indexés dans `.stores()`, pas la forme complète des objets stockés. Les
+ * anciens enregistrements n'ont simplement pas ce champ (undefined = comme
+ * non renseigné, cohérent avec sport/foodDeviation).
  */
 export interface DailyLog {
   id?: number;
   date: string;
   sport: boolean;
   foodDeviation: boolean;
+  period?: boolean;
 }
 
 /**

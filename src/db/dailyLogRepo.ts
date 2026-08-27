@@ -3,7 +3,7 @@ import { db, type DailyLog } from "../db/schema";
 /** Crée ou met à jour le log du jour (une seule entrée par date). */
 export async function setDailyLog(
   date: string,
-  patch: Partial<Pick<DailyLog, "sport" | "foodDeviation">>
+  patch: Partial<Pick<DailyLog, "sport" | "foodDeviation" | "period">>
 ): Promise<void> {
   const existing = await db.dailyLogs.where("date").equals(date).first();
   if (existing) {
@@ -13,6 +13,7 @@ export async function setDailyLog(
       date,
       sport: patch.sport ?? false,
       foodDeviation: patch.foodDeviation ?? false,
+      period: patch.period ?? false,
     });
   }
 }
