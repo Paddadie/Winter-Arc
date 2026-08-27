@@ -31,3 +31,29 @@
 .settings-hidden {
   display: none;
 }
+
+.settings-tile-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s);
+}
+
+.settings-tile-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.settings-tile-checkbox {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--color-ink);
+  flex-shrink: 0;
+}
+
+.settings-tile-icon {
+  font-size: 18px;
+}

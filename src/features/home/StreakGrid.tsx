@@ -4,6 +4,7 @@ import { CardLabel } from "../../components/CardLabel";
 import { getWeightEntriesBetween } from "../../db/weightRepo";
 import { getApneaSessionsBetween } from "../../db/apneaRepo";
 import { todayISO, addDays } from "../../utils/date";
+import { getHiddenTileIds } from "./tileVisibility";
 import "./StreakGrid.css";
 
 const DAYS = 15;
@@ -13,7 +14,8 @@ const DAYS = 15;
  * si le poids et l'apnée ont été renseignés ce jour-là. Sport/écart est
  * volontairement exclu (jugé moins indispensable à suivre au jour le jour).
  * "Rempli" = au moins une entrée existe ce jour-là, même logique que le
- * reste de l'app (pastilles du graphique, checklist du jour...).
+ * reste de l'app (pastilles du graphique, checklist du jour...). Une
+ * rangée disparaît si sa tuile est masquée dans les réglages.
  */
 export function StreakGrid() {
   const [weightDates, setWeightDates] = useState<Set<string> | null>(null);
@@ -34,29 +36,38 @@ export function StreakGrid() {
 
   if (weightDates === null || apneaDates === null) return null;
 
+  const hiddenTileIds = getHiddenTileIds();
+  const showWeight = !hiddenTileIds.has("weight");
+  const showApnea = !hiddenTileIds.has("apnea");
+  if (!showWeight && !showApnea) return null;
+
   const days = Array.from({ length: DAYS }, (_, i) => addDays(todayISO(), -(DAYS - 1 - i)));
 
   return (
     <Card>
       <CardLabel className="card-label--flush">Suivi — {DAYS} derniers jours</CardLabel>
 
-      <div className="streak-section">
-        <p className="streak-label">Poids</p>
-        <div className="streak-cells">
-          {days.map((date) => (
-            <span key={date} className={`streak-cell ${weightDates.has(date) ? "streak-cell--coral" : ""}`} />
-          ))}
+      {showWeight && (
+        <div className="streak-section">
+          <p className="streak-label">Poids</p>
+          <div className="streak-cells">
+            {days.map((date) => (
+              <span key={date} className={`streak-cell ${weightDates.has(date) ? "streak-cell--coral" : ""}`} />
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
-      <div className="streak-section">
-        <p className="streak-label">Apnée</p>
-        <div className="streak-cells">
-          {days.map((date) => (
-            <span key={date} className={`streak-cell ${apneaDates.has(date) ? "streak-cell--teal" : ""}`} />
-          ))}
+      {showApnea && (
+        <div className="streak-section">
+          <p className="streak-label">Apnée</p>
+          <div className="streak-cells">
+            {days.map((date) => (
+              <span key={date} className={`streak-cell ${apneaDates.has(date) ? "streak-cell--teal" : ""}`} />
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </Card>
   );
 }

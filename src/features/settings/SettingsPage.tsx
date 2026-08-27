@@ -4,14 +4,22 @@ import { Card } from "../../components/Card";
 import { CardLabel } from "../../components/CardLabel";
 import { exportAllData, importAllData, isValidBackupData, type BackupData } from "../../db/backupRepo";
 import { todayISO } from "../../utils/date";
+import { featureTiles } from "../home/features.config";
+import { getHiddenTileIds, setTileHidden } from "../home/tileVisibility";
 import "./SettingsPage.css";
 
 export function SettingsPage() {
   const [exportFeedback, setExportFeedback] = useState(false);
   const [importError, setImportError] = useState<string | null>(null);
   const [importing, setImporting] = useState(false);
+  const [hiddenTileIds, setHiddenTileIds] = useState(() => getHiddenTileIds());
   const fileInputRef = useRef<HTMLInputElement>(null);
   const downloadLinkRef = useRef<HTMLAnchorElement>(null);
+
+  function handleToggleTile(id: string) {
+    setTileHidden(id, !hiddenTileIds.has(id));
+    setHiddenTileIds(getHiddenTileIds());
+  }
 
   async function handleExport() {
     const data = await exportAllData();
@@ -72,6 +80,27 @@ export function SettingsPage() {
 
   return (
     <PageLayout title="Réglages" accentColor="var(--color-ink)">
+      <Card>
+        <CardLabel>Tuiles de l'accueil</CardLabel>
+        <p className="settings-description">
+          Activer/Désactiver les tuiles à utiliser depuis l'écran d'accueil
+        </p>
+        <div className="settings-tile-list">
+          {featureTiles.map((tile) => (
+            <label key={tile.id} className="settings-tile-row">
+              <input
+                type="checkbox"
+                checked={!hiddenTileIds.has(tile.id)}
+                onChange={() => handleToggleTile(tile.id)}
+                className="settings-tile-checkbox"
+              />
+              <span className="settings-tile-icon">{tile.icon}</span>
+              <span>{tile.label}</span>
+            </label>
+          ))}
+        </div>
+      </Card>
+
       <Card>
         <CardLabel>Sauvegarde</CardLabel>
         <p className="settings-description">

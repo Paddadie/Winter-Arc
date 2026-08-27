@@ -3,10 +3,13 @@ import { featureTiles } from "./features.config";
 import { Tile } from "./Tile";
 import { TodayChecklist } from "./TodayChecklist";
 import { StreakGrid } from "./StreakGrid";
+import { getHiddenTileIds } from "./tileVisibility";
 import "./HomePage.css";
 
 export function HomePage() {
   const navigate = useNavigate();
+  const hiddenTileIds = getHiddenTileIds();
+  const visibleTiles = featureTiles.filter((tile) => !hiddenTileIds.has(tile.id));
 
   return (
     <div className="home-page">
@@ -25,7 +28,7 @@ export function HomePage() {
       <StreakGrid />
 
       <div className="home-tiles">
-        {featureTiles.map((tile) => (
+        {visibleTiles.map((tile) => (
           <Tile key={tile.id} tile={tile} />
         ))}
       </div>
