@@ -15,13 +15,6 @@ export function formatDurationWithMs(totalMs: number): string {
   return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}:${String(centis).padStart(2, "0")}`;
 }
 
-/** Moyenne (arrondie à la seconde) d'une liste de durées, ou null si vide. */
-export function averageDuration(durationsSec: number[]): number | null {
-  if (durationsSec.length === 0) return null;
-  const total = durationsSec.reduce((sum, d) => sum + d, 0);
-  return Math.round(total / durationsSec.length);
-}
-
 export interface ApneaDailyPoint {
   date: string;
   durationSec: number;
@@ -29,12 +22,13 @@ export interface ApneaDailyPoint {
 }
 
 /**
- * Regroupe des sessions par jour et calcule la moyenne de chaque jour, pour
- * un graphique de progression lisible (un point par jour plutôt qu'un point
- * par mesure). `sessions` doit être trié par date croissante en entrée : les
- * jours ressortent alors dans le même ordre, sans tri supplémentaire.
+ * Regroupe des sessions par jour et retient la meilleure performance de
+ * chaque jour (plus pertinent qu'une moyenne : une séance ratée un jour où
+ * tu as par ailleurs bien performé ne doit pas tirer le point vers le bas).
+ * `sessions` doit être trié par date croissante en entrée : les jours
+ * ressortent alors dans le même ordre, sans tri supplémentaire.
  */
-export function groupDailyAverages(sessions: ApneaSession[]): ApneaDailyPoint[] {
+export function groupDailyBest(sessions: ApneaSession[]): ApneaDailyPoint[] {
   const byDate = new Map<string, number[]>();
   for (const s of sessions) {
     const durations = byDate.get(s.date) ?? [];
@@ -43,7 +37,7 @@ export function groupDailyAverages(sessions: ApneaSession[]): ApneaDailyPoint[] 
   }
   return [...byDate.entries()].map(([date, durations]) => ({
     date,
-    durationSec: averageDuration(durations)!,
+    durationSec: Math.max(...durations),
     count: durations.length,
   }));
 }
@@ -54,7 +48,12 @@ export interface ApneaWindowStats {
   best: { durationSec: number; date: string };
 }
 
-/** Moyenne, pire et meilleure performance (avec leur date) sur un ensemble de sessions, ou null si vide. */
+/**
+ * Moyenne, pire et meilleure performance (avec leur date) sur un ensemble de
+ * sessions, ou null si vide. Moyenne calculée sur TOUTES les séances brutes
+ * de la période (pas de regroupement par jour) — comportement volontairement
+ * conservé tel quel.
+ */
 export function computeWindowStats(sessions: ApneaSession[]): ApneaWindowStats | null {
   if (sessions.length === 0) return null;
   const worst = sessions.reduce((min, s) => (s.durationSec < min.durationSec ? s : min));
@@ -64,4 +63,11 @@ export function computeWindowStats(sessions: ApneaSession[]): ApneaWindowStats |
     worst: { durationSec: worst.durationSec, date: worst.date },
     best: { durationSec: best.durationSec, date: best.date },
   };
+
+/** Moyenne (arrondie à la seconde) d'une liste de durées, ou null si vide. */
+function averageDuration(durationsSec: number[]): number | null {
+  if (durationsSec.length === 0) return null;
+  const total = durationsSec.reduce((sum, d) => sum + d, 0);
+  return Math.round(total / durationsSec.length);
+}
 }

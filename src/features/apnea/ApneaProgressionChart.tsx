@@ -7,13 +7,13 @@ import "../../components/chartTooltip.css";
 import "./ApneaProgressionChart.css";
 
 interface ApneaProgressionChartProps {
-  /** Un point par jour (moyenne des mesures de ce jour), trié par date croissante. */
+  /** Un point par jour (meilleure mesure de ce jour), trié par date croissante. */
   points: ApneaDailyPoint[];
 }
 
 /**
  * Graphique de l'évolution des durées d'apnée dans le temps. Un jour = un
- * point (moyenne des mesures de ce jour-là), pour rester lisible même les
+ * point (meilleure mesure de ce jour-là), pour rester lisible même les
  * jours à plusieurs mesures — le détail individuel reste dans le tableau.
  */
 export function ApneaProgressionChart({ points }: ApneaProgressionChartProps) {
@@ -78,7 +78,7 @@ function ProgressionTooltip({
       <div className="chart-tooltip-title">{formatTick(point.date)}</div>
       <div>
         {formatDuration(point.durationSec)}
-        {point.count > 1 ? ` (moyenne de ${point.count} mesures)` : ""}
+        {point.count > 1 ? ` (meilleure sur ${point.count} mesures)` : ""}
       </div>
     </div>
   );
