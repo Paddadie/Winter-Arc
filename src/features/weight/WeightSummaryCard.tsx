@@ -40,7 +40,7 @@ export function WeightSummaryCard({ latestEntry, goal }: WeightSummaryCardProps)
         <div className="weight-summary-stats-grid">
           <StatBlock
             label="Écart trajectoire"
-            value={trajectoryDiff !== null ? `${trajectoryDiff > 0 ? "+" : ""}${formatKg(trajectoryDiff)}` : "—"}
+            value={trajectoryDiff !== null ? formatKg(trajectoryDiff) : "—"}
             variant={trajectoryDiff === null ? undefined : trajectoryDiff > 0 ? "alert" : "success"}
           />
           <StatBlock label="Écart objectif" value={remaining !== null ? formatKg(Math.abs(remaining)) : "—"} />
