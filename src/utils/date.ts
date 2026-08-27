@@ -34,6 +34,45 @@ export function relativeDayLabel(iso: string): string {
   return new Date(iso).toLocaleDateString("fr-FR", { day: "numeric", month: "long" });
 }
 
+/**
+ * Durée entre deux dates ISO au format "X ans Y mois Z jours", raccourcie
+ * automatiquement pour rester lisible sur les longues échéances : au-delà
+ * de 5 mois, les jours ne sont plus affichés ; au-delà de 2 ans, les mois
+ * non plus (ne montre alors que les années). Suppose `toIso` >= `fromIso`.
+ */
+export function formatDurationLabel(fromIso: string, toIso: string): string {
+  const [fy, fm, fd] = fromIso.split("-").map(Number);
+  const [ty, tm, td] = toIso.split("-").map(Number);
+
+  let years = ty - fy;
+  let months = tm - fm;
+  let days = td - fd;
+
+  if (days < 0) {
+    months -= 1;
+    days += new Date(ty, tm - 1, 0).getDate(); // nombre de jours du mois précédent `tm`
+  }
+  if (months < 0) {
+    years -= 1;
+    months += 12;
+  }
+
+  const totalMonths = years * 12 + months;
+  const parts: string[] = [];
+
+  if (totalMonths > 24) {
+    parts.push(`${years} an${years > 1 ? "s" : ""}`);
+  } else if (totalMonths > 5) {
+    if (years > 0) parts.push(`${years} an${years > 1 ? "s" : ""}`);
+    if (months > 0) parts.push(`${months} mois`);
+  } else {
+    if (months > 0) parts.push(`${months} mois`);
+    if (days > 0 || parts.length === 0) parts.push(`${days} jour${days > 1 ? "s" : ""}`);
+  }
+
+  return parts.join(" ");
+}
+
 /** Nombre de jours entre deux dates ISO (b - a). */
 export function daysBetween(a: string, b: string): number {
   const [ay, am, ad] = a.split("-").map(Number);
