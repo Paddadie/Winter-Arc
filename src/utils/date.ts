@@ -73,6 +73,13 @@ export function formatDurationLabel(fromIso: string, toIso: string): string {
   return parts.join(" ");
 }
 
+/** Vrai si la date ISO tombe un samedi ou un dimanche. */
+export function isWeekend(iso: string): boolean {
+  const [y, m, d] = iso.split("-").map(Number);
+  const day = new Date(y, m - 1, d).getDay();
+  return day === 0 || day === 6;
+}
+
 /** Nombre de jours entre deux dates ISO (b - a). */
 export function daysBetween(a: string, b: string): number {
   const [ay, am, ad] = a.split("-").map(Number);

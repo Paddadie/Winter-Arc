@@ -13,7 +13,7 @@ import {
 import { Card } from "../../components/Card";
 import { CardLabel } from "../../components/CardLabel";
 import { todayISO } from "../../utils/date";
-import { WeightDot, ChartTooltip, Legend, formatTick } from "./weightChartCommon";
+import { WeightDot, ChartTooltip, Legend, WeekendAreas, formatTick } from "./weightChartCommon";
 import type { WeightSeriesPoint } from "../../domain/weightSeries";
 import "./WeightHistoryChart.css";
 
@@ -80,6 +80,7 @@ export function WeightHistoryChart({ series, hasGoal, onSelectDate, onVisibleRan
       <div className="weight-history-canvas">
         <ResponsiveContainer>
           <ComposedChart data={series} margin={{ top: 20, right: 16, bottom: 14, left: 0 }} onClick={handleChartClick}>
+            <WeekendAreas series={series} />
             <CartesianGrid stroke="var(--color-border)" vertical={false} />
             <XAxis
               dataKey="date"

@@ -1,3 +1,5 @@
+import { ReferenceArea } from "recharts";
+import { isWeekend } from "../../utils/date";
 import type { WeightSeriesPoint } from "../../domain/weightSeries";
 import "../../components/chartTooltip.css";
 import "./weightChartCommon.css";
@@ -43,6 +45,36 @@ export function WeightDot(props: { cx?: number; cy?: number; payload?: WeightSer
 function DayMarker({ cx, cy, shown, color }: { cx: number; cy: number; shown: boolean; color: string }) {
   if (!shown) return null;
   return <circle cx={cx} cy={cy} r={2.5} fill={color} />;
+}
+
+/**
+ * Fond bleu clair derrière les jours de week-end, pour les repérer d'un
+ * coup d'œil sur le graphique. Regroupe les jours de week-end consécutifs
+ * (samedi+dimanche) en une seule zone plutôt que deux, pour un rendu propre.
+ * À placer en premier enfant du graphique pour rester derrière la grille
+ * et les courbes.
+ */
+export function WeekendAreas({ series }: { series: WeightSeriesPoint[] }) {
+  const ranges: Array<{ start: string; end: string }> = [];
+  let current: { start: string; end: string } | null = null;
+
+  for (const point of series) {
+    if (isWeekend(point.date)) {
+      current = current ? { start: current.start, end: point.date } : { start: point.date, end: point.date };
+    } else if (current) {
+      ranges.push(current);
+      current = null;
+    }
+  }
+  if (current) ranges.push(current);
+
+  return (
+    <>
+      {ranges.map((range) => (
+        <ReferenceArea key={range.start} x1={range.start} x2={range.end} fill="var(--color-teal-soft)" fillOpacity={0.6} />
+      ))}
+    </>
+  );
 }
 
 export function ChartTooltip({
