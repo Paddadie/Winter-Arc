@@ -4,10 +4,16 @@ import { Card } from "../../components/Card";
 import { CardLabel } from "../../components/CardLabel";
 import { exportAllData, importAllData, isValidBackupData, type BackupData } from "../../db/backupRepo";
 import { todayISO } from "../../utils/date";
-import { featureTiles } from "../home/features.config";
+import { featureTiles, type FeatureId } from "../home/features.config";
 import { getHiddenTileIds, setTileHidden } from "../home/tileVisibility";
 import { isPeriodTrackingEnabled, setPeriodTrackingEnabled } from "../weight/periodTrackingPref";
+import { isDarkModeEnabled, setDarkModeEnabled } from "./themePref";
 import "./SettingsPage.css";
+
+/** Durée d'affichage des messages "✓ ..." après une action réussie. */
+const FEEDBACK_MS = 2000;
+/** Délai avant libération de l'URL de blob d'export (voir handleExport). */
+const REVOKE_DELAY_MS = 60_000;
 
 export function SettingsPage() {
   const [exportFeedback, setExportFeedback] = useState(false);
@@ -15,10 +21,11 @@ export function SettingsPage() {
   const [importing, setImporting] = useState(false);
   const [hiddenTileIds, setHiddenTileIds] = useState(() => getHiddenTileIds());
   const [periodTrackingEnabled, setPeriodTrackingEnabledState] = useState(() => isPeriodTrackingEnabled());
+  const [darkMode, setDarkMode] = useState(() => isDarkModeEnabled());
   const fileInputRef = useRef<HTMLInputElement>(null);
   const downloadLinkRef = useRef<HTMLAnchorElement>(null);
 
-  function handleToggleTile(id: string) {
+  function handleToggleTile(id: FeatureId) {
     setTileHidden(id, !hiddenTileIds.has(id));
     setHiddenTileIds(getHiddenTileIds());
   }
@@ -29,19 +36,30 @@ export function SettingsPage() {
     setPeriodTrackingEnabledState(next);
   }
 
+  function handleToggleDarkMode() {
+    const next = !darkMode;
+    setDarkModeEnabled(next);
+    setDarkMode(next);
+  }
+
   async function handleExport() {
+    const link = downloadLinkRef.current;
+    if (!link) return;
+
     const data = await exportAllData();
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
-    const link = downloadLinkRef.current;
-    if (link) {
-      link.href = url;
-      link.download = `winter-arc-export-${todayISO()}.json`;
-      link.click();
-    }
-    URL.revokeObjectURL(url);
+    link.href = url;
+    link.download = `winter-arc-export-${todayISO()}.json`;
+    link.click();
+
+    // Révoquer l'URL immédiatement après le clic annule le téléchargement sur
+    // Safari iOS, qui ne lit le blob qu'au tick suivant. On libère la mémoire
+    // un peu plus tard, une fois le téléchargement effectivement démarré.
+    setTimeout(() => URL.revokeObjectURL(url), REVOKE_DELAY_MS);
+
     setExportFeedback(true);
-    setTimeout(() => setExportFeedback(false), 2000);
+    setTimeout(() => setExportFeedback(false), FEEDBACK_MS);
   }
 
   function handleImportClick() {
@@ -81,7 +99,7 @@ export function SettingsPage() {
       await importAllData(data);
       window.location.reload();
     } catch {
-      setImportError("L'import a échoué, aucune donnée n'a été modifiée.");
+      setImportError("L'import a échoué. Les données de l'appareil n'ont pas été modifiées.");
       setImporting(false);
     }
   }
@@ -107,6 +125,25 @@ export function SettingsPage() {
             </label>
           ))}
         </div>
+      </Card>
+
+      <Card>
+        <CardLabel>Apparence</CardLabel>
+        <p className="settings-description">
+          Par défaut, l'application suit l'apparence de l'appareil. Ce réglage la force dans un sens ou dans l'autre.
+        </p>
+        <label className="settings-tile-row">
+          <input
+            type="checkbox"
+            checked={darkMode}
+            onChange={handleToggleDarkMode}
+            className="settings-tile-checkbox"
+          />
+          <span className="settings-tile-icon" aria-hidden="true">
+            🌙
+          </span>
+          <span>Mode sombre</span>
+        </label>
       </Card>
 
       <Card>
@@ -137,7 +174,7 @@ export function SettingsPage() {
           Exporter mes données (JSON)
         </button>
         {exportFeedback && <p className="form-feedback">✓ Fichier téléchargé</p>}
-        <a ref={downloadLinkRef} className="settings-hidden" />
+        <a ref={downloadLinkRef} aria-hidden="true" tabIndex={-1} className="settings-hidden" />
       </Card>
 
       <Card>
@@ -151,6 +188,8 @@ export function SettingsPage() {
           type="file"
           accept="application/json"
           onChange={handleFileSelected}
+          aria-hidden="true"
+          tabIndex={-1}
           className="settings-hidden"
         />
         <button

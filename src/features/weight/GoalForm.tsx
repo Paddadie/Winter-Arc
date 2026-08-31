@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Card } from "../../components/Card";
 import { setGoal } from "../../db/goalRepo";
-import { todayISO } from "../../utils/date";
+import { todayISO, addDays } from "../../utils/date";
 import type { WeightGoal } from "../../db/schema";
 import "./GoalForm.css";
 
@@ -25,7 +25,10 @@ export function GoalForm({ currentGoal, latestWeightKg, onSaved, onCancel }: Goa
 
   const parsedStart = parseFloat(startWeight.replace(",", "."));
   const parsedTarget = parseFloat(targetWeight.replace(",", "."));
-  const minDate = todayISO();
+  const today = todayISO();
+  // Le sélecteur iOS ne doit pas proposer de date que la validation refusera :
+  // l'objectif doit être strictement postérieur à aujourd'hui, donc au plus tôt demain.
+  const earliestTargetDate = addDays(today, 1);
 
   async function handleSave() {
     if (isNaN(parsedStart) || parsedStart <= 0) {
@@ -40,7 +43,7 @@ export function GoalForm({ currentGoal, latestWeightKg, onSaved, onCancel }: Goa
       setError("Choisis une date cible.");
       return;
     }
-    if (targetDate <= minDate) {
+    if (targetDate <= today) {
       setError("La date cible doit être postérieure à aujourd'hui.");
       return;
     }
@@ -49,7 +52,7 @@ export function GoalForm({ currentGoal, latestWeightKg, onSaved, onCancel }: Goa
     try {
       await setGoal({
         startWeightKg: Math.round(parsedStart * 10) / 10,
-        startDate: todayISO(),
+        startDate: today,
         targetWeightKg: Math.round(parsedTarget * 10) / 10,
         targetDate,
       });
@@ -61,7 +64,7 @@ export function GoalForm({ currentGoal, latestWeightKg, onSaved, onCancel }: Goa
 
   return (
     <Card className="goal-form-card">
-      <p className="goal-form-title">{currentGoal ? "Modifier l'objectif" : "Définir un objectif"}</p>
+      <h2 className="goal-form-title">{currentGoal ? "Modifier l'objectif" : "Définir un objectif"}</h2>
 
       <div className="goal-form-fields">
         <label className="goal-form-field">
@@ -91,7 +94,7 @@ export function GoalForm({ currentGoal, latestWeightKg, onSaved, onCancel }: Goa
           <input
             type="date"
             value={targetDate}
-            min={minDate}
+            min={earliestTargetDate}
             onChange={(e) => setTargetDate(e.target.value)}
             className="goal-form-input"
           />

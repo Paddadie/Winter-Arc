@@ -2,6 +2,7 @@ import { ResponsiveContainer, ComposedChart, Line, XAxis, YAxis, Tooltip, Cartes
 import { Card } from "../../components/Card";
 import { CardLabel } from "../../components/CardLabel";
 import { formatDuration } from "../../domain/apnea";
+import { formatDayMonth } from "../../utils/date";
 import type { ApneaDailyPoint } from "../../domain/apnea";
 import "../../components/chartTooltip.css";
 import "./ApneaProgressionChart.css";
@@ -30,7 +31,7 @@ export function ApneaProgressionChart({ points }: ApneaProgressionChartProps) {
               <CartesianGrid stroke="var(--color-border)" vertical={false} />
               <XAxis
                 dataKey="date"
-                tickFormatter={formatTick}
+                tickFormatter={formatDayMonth}
                 interval={Math.max(0, Math.ceil(points.length / 6) - 1)}
                 padding={{ left: 12, right: 12 }}
                 tick={{ fontSize: 11, fill: "var(--color-ink-muted)" }}
@@ -75,16 +76,11 @@ function ProgressionTooltip({
   const point = payload[0].payload;
   return (
     <div className="chart-tooltip">
-      <div className="chart-tooltip-title">{formatTick(point.date)}</div>
+      <div className="chart-tooltip-title">{formatDayMonth(point.date)}</div>
       <div>
         {formatDuration(point.durationSec)}
         {point.count > 1 ? ` (meilleure sur ${point.count} mesures)` : ""}
       </div>
     </div>
   );
-}
-
-function formatTick(iso: string): string {
-  const [, m, d] = iso.split("-");
-  return `${d}/${m}`;
 }

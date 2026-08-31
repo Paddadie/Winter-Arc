@@ -56,18 +56,14 @@ export interface ApneaWindowStats {
  */
 export function computeWindowStats(sessions: ApneaSession[]): ApneaWindowStats | null {
   if (sessions.length === 0) return null;
+
   const worst = sessions.reduce((min, s) => (s.durationSec < min.durationSec ? s : min));
   const best = sessions.reduce((max, s) => (s.durationSec > max.durationSec ? s : max));
+  const totalSec = sessions.reduce((sum, s) => sum + s.durationSec, 0);
+
   return {
-    averageSec: averageDuration(sessions.map((s) => s.durationSec))!,
+    averageSec: Math.round(totalSec / sessions.length),
     worst: { durationSec: worst.durationSec, date: worst.date },
     best: { durationSec: best.durationSec, date: best.date },
   };
-
-/** Moyenne (arrondie à la seconde) d'une liste de durées, ou null si vide. */
-function averageDuration(durationsSec: number[]): number | null {
-  if (durationsSec.length === 0) return null;
-  const total = durationsSec.reduce((sum, d) => sum + d, 0);
-  return Math.round(total / durationsSec.length);
-}
 }

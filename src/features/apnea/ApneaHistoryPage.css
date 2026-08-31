@@ -17,7 +17,7 @@
 .period-button--active {
   border-color: var(--color-teal);
   background: var(--color-teal);
-  color: white;
+  color: var(--color-on-accent);
 }
 
 .apnea-history-table-card {

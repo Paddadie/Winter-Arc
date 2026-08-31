@@ -5,6 +5,7 @@ import { getWeightEntriesBetween } from "../../db/weightRepo";
 import { getApneaSessionsBetween } from "../../db/apneaRepo";
 import { todayISO, addDays } from "../../utils/date";
 import { getHiddenTileIds } from "./tileVisibility";
+import { useRefreshOnForeground } from "../../utils/useRefreshOnForeground";
 import "./StreakGrid.css";
 
 const DAYS = 15;
@@ -21,18 +22,24 @@ export function StreakGrid() {
   const [weightDates, setWeightDates] = useState<Set<string> | null>(null);
   const [apneaDates, setApneaDates] = useState<Set<string> | null>(null);
 
-  useEffect(() => {
+  function refresh() {
     (async () => {
-      const start = addDays(todayISO(), -(DAYS - 1));
-      const end = todayISO();
+      const today = todayISO();
+      const start = addDays(today, -(DAYS - 1));
       const [weightEntries, apneaSessions] = await Promise.all([
-        getWeightEntriesBetween(start, end),
-        getApneaSessionsBetween(start, end),
+        getWeightEntriesBetween(start, today),
+        getApneaSessionsBetween(start, today),
       ]);
       setWeightDates(new Set(weightEntries.map((e) => e.date)));
       setApneaDates(new Set(apneaSessions.map((s) => s.date)));
-    })();
-  }, []);
+    })().catch(() => {
+      setWeightDates(new Set());
+      setApneaDates(new Set());
+    });
+  }
+
+  useEffect(refresh, []);
+  useRefreshOnForeground(refresh);
 
   if (weightDates === null || apneaDates === null) return null;
 
@@ -41,33 +48,52 @@ export function StreakGrid() {
   const showApnea = !hiddenTileIds.has("apnea");
   if (!showWeight && !showApnea) return null;
 
-  const days = Array.from({ length: DAYS }, (_, i) => addDays(todayISO(), -(DAYS - 1 - i)));
+  const today = todayISO();
+  const days = Array.from({ length: DAYS }, (_, i) => addDays(today, -(DAYS - 1 - i)));
 
   return (
     <Card>
       <CardLabel className="card-label--flush">Suivi — {DAYS} derniers jours</CardLabel>
-
-      {showWeight && (
-        <div className="streak-section">
-          <p className="streak-label">Poids</p>
-          <div className="streak-cells">
-            {days.map((date) => (
-              <span key={date} className={`streak-cell ${weightDates.has(date) ? "streak-cell--coral" : ""}`} />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {showApnea && (
-        <div className="streak-section">
-          <p className="streak-label">Apnée</p>
-          <div className="streak-cells">
-            {days.map((date) => (
-              <span key={date} className={`streak-cell ${apneaDates.has(date) ? "streak-cell--teal" : ""}`} />
-            ))}
-          </div>
-        </div>
-      )}
+      {showWeight && <StreakRow label="Poids" days={days} filledDates={weightDates} modifier="coral" />}
+      {showApnea && <StreakRow label="Apnée" days={days} filledDates={apneaDates} modifier="teal" />}
     </Card>
+  );
+}
+
+/**
+ * Une rangée de la grille. Les cases n'ont pas de texte : elles sont
+ * masquées aux lecteurs d'écran au profit d'un résumé chiffré sur la
+ * rangée, plus utile qu'une énumération de quinze cases vides.
+ */
+function StreakRow({
+  label,
+  days,
+  filledDates,
+  modifier,
+}: {
+  label: string;
+  days: string[];
+  filledDates: Set<string>;
+  modifier: "coral" | "teal";
+}) {
+  const filledCount = days.filter((date) => filledDates.has(date)).length;
+
+  return (
+    <div className="streak-section">
+      <h3 className="streak-label">{label}</h3>
+      <div
+        className="streak-cells"
+        role="img"
+        aria-label={`${label} : ${filledCount} jour(s) renseigné(s) sur les ${days.length} derniers`}
+      >
+        {days.map((date) => (
+          <span
+            key={date}
+            aria-hidden="true"
+            className={`streak-cell ${filledDates.has(date) ? `streak-cell--${modifier}` : ""}`}
+          />
+        ))}
+      </div>
+    </div>
   );
 }

@@ -1,4 +1,5 @@
 .tile {
+  position: relative;
   display: flex;
   align-items: center;
   gap: var(--space-m);
@@ -44,4 +45,19 @@
 .tile-description {
   font-size: 14px;
   color: var(--color-ink-muted);
+}
+
+/*
+ * Le rappel textuel remplace la description au lieu de s'ajouter à elle :
+ * la tuile garde exactement la même hauteur, la page d'accueil ne bouge donc
+ * pas selon qu'un rappel est actif ou non.
+ */
+.tile-pending-dot {
+  position: absolute;
+  top: var(--space-m);
+  right: var(--space-m);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--tile-color);
 }

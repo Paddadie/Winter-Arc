@@ -12,8 +12,8 @@ import {
 } from "recharts";
 import { Card } from "../../components/Card";
 import { CardLabel } from "../../components/CardLabel";
-import { todayISO } from "../../utils/date";
-import { WeightDot, ChartTooltip, Legend, DayHighlights, formatTick } from "./weightChartCommon";
+import { todayISO, formatDayMonth } from "../../utils/date";
+import { WeightDot, ChartTooltip, Legend, DayHighlights, TrendLine } from "./weightChartCommon";
 import { isPeriodTrackingEnabled } from "./periodTrackingPref";
 import type { WeightSeriesPoint } from "../../domain/weightSeries";
 import "./WeightHistoryChart.css";
@@ -36,14 +36,11 @@ interface WeightHistoryChartProps {
 export function WeightHistoryChart({ series, hasGoal, onSelectDate, onVisibleRangeChange }: WeightHistoryChartProps) {
   const [brushRange, setBrushRange] = useState<[number, number]>([0, series.length - 1]);
   const hasAnyWeight = series.some((p) => p.weightKg !== null);
+  const hasTrend = series.some((p) => p.trendWeightKg !== null);
 
   // Intervalle de ticks adapté à la longueur de la série, pour garder
   // un axe lisible que l'historique couvre quelques semaines ou un an.
   const tickInterval = Math.max(0, Math.ceil(series.length / 7) - 1);
-
-  function handleChartClick(state: { activeLabel?: string | number } | null) {
-    if (state?.activeLabel != null) onSelectDate(String(state.activeLabel));
-  }
 
   function handleBrushChange(range: { startIndex?: number; endIndex?: number }) {
     const start = range.startIndex ?? 0;
@@ -83,14 +80,13 @@ export function WeightHistoryChart({ series, hasGoal, onSelectDate, onVisibleRan
           <ComposedChart
             data={series}
             margin={{ top: 20, right: 16, bottom: 14, left: 0 }}
-            onClick={handleChartClick}
             barCategoryGap={0}
           >
             <DayHighlights series={series} showPeriod={isPeriodTrackingEnabled()} />
             <CartesianGrid stroke="var(--color-border)" vertical={false} />
             <XAxis
               dataKey="date"
-              tickFormatter={formatTick}
+              tickFormatter={formatDayMonth}
               interval={tickInterval}
               padding={{ left: 12, right: 12 }}
               tick={{ fontSize: 11, fill: "var(--color-ink-muted)" }}
@@ -122,12 +118,14 @@ export function WeightHistoryChart({ series, hasGoal, onSelectDate, onVisibleRan
               />
             )}
 
+            {hasTrend && <TrendLine />}
+
             <Line
               type="monotone"
               dataKey="weightKg"
               stroke="var(--color-coral)"
               strokeWidth={2.5}
-              dot={<WeightDot />}
+              dot={<WeightDot onSelect={onSelectDate} />}
               activeDot={{ r: 5 }}
               isAnimationActive={false}
               connectNulls={false}
@@ -139,7 +137,7 @@ export function WeightHistoryChart({ series, hasGoal, onSelectDate, onVisibleRan
               stroke="var(--color-coral)"
               fill="var(--color-coral-soft)"
               travellerWidth={10}
-              tickFormatter={formatTick}
+              tickFormatter={formatDayMonth}
               startIndex={brushRange[0]}
               endIndex={brushRange[1]}
               onChange={handleBrushChange}
@@ -148,7 +146,7 @@ export function WeightHistoryChart({ series, hasGoal, onSelectDate, onVisibleRan
         </ResponsiveContainer>
       </div>
 
-      <Legend hasGoal={hasGoal} showPeriod={isPeriodTrackingEnabled()} />
+      <Legend hasGoal={hasGoal} hasTrend={hasTrend} showPeriod={isPeriodTrackingEnabled()} />
     </Card>
   );
 }

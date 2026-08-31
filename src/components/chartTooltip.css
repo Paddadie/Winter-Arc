@@ -1,7 +1,7 @@
 /* Style d'infobulle partagé entre tous les graphiques Recharts de l'app. */
 .chart-tooltip {
   background: var(--color-depth);
-  color: white;
+  color: var(--color-on-depth);
   border-radius: 10px;
   padding: 8px 12px;
   font-size: 12px;

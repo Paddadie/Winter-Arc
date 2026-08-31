@@ -4,7 +4,9 @@ import { CardLabel } from "../../components/CardLabel";
 import { addWeightEntry } from "../../db/weightRepo";
 import { getDailyLog, setDailyLog } from "../../db/dailyLogRepo";
 import { todayISO } from "../../utils/date";
+import { useRefreshOnForeground } from "../../utils/useRefreshOnForeground";
 import { isPeriodTrackingEnabled } from "./periodTrackingPref";
+import { formatKgValue } from "./weightFormat";
 import type { WeightEntry } from "../../db/schema";
 import "./DayEntryCard.css";
 
@@ -23,6 +25,9 @@ interface DayEntryCardProps {
 export function DayEntryCard({ entries, onSaved }: DayEntryCardProps) {
   const [date, setDate] = useState(todayISO());
   const [showDateEdit, setShowDateEdit] = useState(false);
+  // Vrai dès que l'utilisateur a choisi une date lui-même : on cesse alors
+  // de la recaler automatiquement sur aujourd'hui.
+  const [dateChosenManually, setDateChosenManually] = useState(false);
 
   const [weightValue, setWeightValue] = useState("");
   const [weightError, setWeightError] = useState<string | null>(null);
@@ -36,9 +41,13 @@ export function DayEntryCard({ entries, onSaved }: DayEntryCardProps) {
 
   // Recharge le poids (depuis les entrées déjà en mémoire) et le journal
   // (depuis la base) à chaque changement de date, pour éditer ce jour-là.
+  // Volontairement déclenché par `date` seule et pas par `entries` : le
+  // parent renvoie une nouvelle liste après chaque enregistrement, et
+  // réagir à ce changement écraserait ce que l'utilisateur est en train de
+  // taper juste après avoir validé une pesée.
   useEffect(() => {
     const existing = entries.find((e) => e.date === date);
-    setWeightValue(existing ? existing.weightKg.toFixed(1).replace(".", ",") : "");
+    setWeightValue(existing ? formatKgValue(existing.weightKg) : "");
     setWeightError(null);
     setSavedFeedback(false);
 
@@ -47,8 +56,14 @@ export function DayEntryCard({ entries, onSaved }: DayEntryCardProps) {
       setFoodDeviation(log?.foodDeviation ?? false);
       setPeriod(log?.period ?? false);
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [date]);
+
+  // L'app peut rester des jours en arrière-plan sur l'écran d'accueil iPhone.
+  // Sans ce recalage, on rouvrirait la saisie encore pointée sur la veille et
+  // on enregistrerait le poids du matin sur le mauvais jour.
+  useRefreshOnForeground(() => {
+    if (!dateChosenManually) setDate(todayISO());
+  });
 
   async function handleSaveWeight() {
     const parsedWeight = parseFloat(weightValue.replace(",", "."));
@@ -99,7 +114,10 @@ export function DayEntryCard({ entries, onSaved }: DayEntryCardProps) {
             type="date"
             value={date}
             max={todayISO()}
-            onChange={(e) => setDate(e.target.value)}
+            onChange={(e) => {
+              setDate(e.target.value);
+              setDateChosenManually(true);
+            }}
             className="day-entry-date-input"
           />
         ) : (
@@ -158,6 +176,7 @@ function Chip({
   return (
     <button
       onClick={onClick}
+      aria-pressed={active}
       className={`chip chip--${variant} ${active ? "chip--active" : ""}`}
     >
       {label}

@@ -58,7 +58,7 @@
   border-radius: var(--radius-m);
   padding: 12px;
   background: var(--color-coral);
-  color: white;
+  color: var(--color-on-accent);
   font-weight: 700;
   font-size: 15px;
 }

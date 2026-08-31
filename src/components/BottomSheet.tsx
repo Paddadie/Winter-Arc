@@ -5,6 +5,8 @@ const TRANSITION_MS = 220; // doit rester synchro avec la durée des transitions
 
 interface BottomSheetProps {
   onClose: () => void;
+  /** Nom accessible du dialogue, annoncé à l'ouverture par les lecteurs d'écran. */
+  label: string;
   /** Reçoit une fonction "close" animée à utiliser pour tout bouton fermer interne (✕, etc.). */
   children: (close: () => void) => ReactNode;
 }
@@ -15,7 +17,7 @@ interface BottomSheetProps {
  * montée pendant l'animation de sortie avant de prévenir le parent via
  * onClose, pour que la fermeture soit aussi fluide que l'ouverture.
  */
-export function BottomSheet({ onClose, children }: BottomSheetProps) {
+export function BottomSheet({ onClose, label, children }: BottomSheetProps) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -35,6 +37,9 @@ export function BottomSheet({ onClose, children }: BottomSheetProps) {
     >
       <div
         onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-label={label}
         className={`bottom-sheet-panel ${visible ? "bottom-sheet-panel--visible" : ""}`}
       >
         {children(handleClose)}

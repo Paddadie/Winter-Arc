@@ -32,7 +32,7 @@
 
 .timer-button--filled {
   border: none;
-  color: white;
+  color: var(--color-on-accent);
 }
 
 .timer-button--outline {
@@ -49,6 +49,7 @@
 
 .timer-button--depth.timer-button--filled {
   background: var(--color-depth);
+  color: var(--color-on-depth);
 }
 
 .timer-button--muted.timer-button--outline {
@@ -94,6 +95,7 @@
 }
 
 .apnea-info-button {
+  position: relative;
   border: 1.5px solid var(--color-ink-muted);
   background: transparent;
   color: var(--color-ink-muted);
@@ -105,6 +107,13 @@
   line-height: 1;
   padding: 0;
   margin-bottom: var(--space-s);
+}
+
+/* Zone tactile élargie : le rond visible ne fait que 22px (voir .close-button). */
+.apnea-info-button::after {
+  content: "";
+  position: absolute;
+  inset: -11px;
 }
 
 .apnea-stats-empty {

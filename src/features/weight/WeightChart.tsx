@@ -11,8 +11,8 @@ import {
 import { useNavigate } from "react-router-dom";
 import { Card } from "../../components/Card";
 import { CardLabel } from "../../components/CardLabel";
-import { todayISO } from "../../utils/date";
-import { WeightDot, ChartTooltip, Legend, DayHighlights, formatTick } from "./weightChartCommon";
+import { todayISO, formatDayMonth } from "../../utils/date";
+import { WeightDot, ChartTooltip, Legend, DayHighlights, TrendLine } from "./weightChartCommon";
 import { isPeriodTrackingEnabled } from "./periodTrackingPref";
 import type { WeightSeriesPoint } from "../../domain/weightSeries";
 import "./WeightChart.css";
@@ -26,6 +26,7 @@ interface WeightChartProps {
 export function WeightChart({ series, hasGoal, onSelectDate }: WeightChartProps) {
   const navigate = useNavigate();
   const hasAnyWeight = series.some((p) => p.weightKg !== null);
+  const hasTrend = series.some((p) => p.trendWeightKg !== null);
   // Dernier poids connu (réel ou estimé) : sert d'ancre pour une échelle Y
   // resserrée autour de la valeur actuelle plutôt qu'un dataMin/dataMax
   // auto-calculé, qui peut produire des graduations à virgule difficiles à
@@ -33,10 +34,6 @@ export function WeightChart({ series, hasGoal, onSelectDate }: WeightChartProps)
   const referenceWeight = [...series].reverse().find((p) => p.weightKg !== null)?.weightKg ?? null;
   const yDomain: [number | string, number | string] =
     referenceWeight !== null ? [referenceWeight - 1.5, referenceWeight + 3] : ["dataMin - 1", "dataMax + 1"];
-
-  function handleChartClick(state: { activeLabel?: string | number } | null) {
-    if (state?.activeLabel != null) onSelectDate(String(state.activeLabel));
-  }
 
   return (
     <Card className="card--flat">
@@ -50,14 +47,13 @@ export function WeightChart({ series, hasGoal, onSelectDate }: WeightChartProps)
             <ComposedChart
               data={series}
               margin={{ top: 20, right: 16, bottom: 14, left: 0 }}
-              onClick={handleChartClick}
               barCategoryGap={0}
             >
               <DayHighlights series={series} showPeriod={isPeriodTrackingEnabled()} />
               <CartesianGrid stroke="var(--color-border)" vertical={false} />
               <XAxis
                 dataKey="date"
-                tickFormatter={formatTick}
+                tickFormatter={formatDayMonth}
                 interval={4}
                 padding={{ left: 12, right: 12 }}
                 tick={{ fontSize: 11, fill: "var(--color-ink-muted)" }}
@@ -89,12 +85,14 @@ export function WeightChart({ series, hasGoal, onSelectDate }: WeightChartProps)
                 />
               )}
 
+              {hasTrend && <TrendLine />}
+
               <Line
                 type="monotone"
                 dataKey="weightKg"
                 stroke="var(--color-coral)"
                 strokeWidth={2.5}
-                dot={<WeightDot />}
+                dot={<WeightDot onSelect={onSelectDate} />}
                 activeDot={{ r: 5 }}
                 isAnimationActive={false}
                 connectNulls={false}
@@ -104,7 +102,7 @@ export function WeightChart({ series, hasGoal, onSelectDate }: WeightChartProps)
         </div>
       )}
 
-      <Legend hasGoal={hasGoal} showPeriod={isPeriodTrackingEnabled()} />
+      <Legend hasGoal={hasGoal} hasTrend={hasTrend} showPeriod={isPeriodTrackingEnabled()} />
 
       <button onClick={() => navigate("/regime/historique")} className="weight-chart-history-link">
         Historique →

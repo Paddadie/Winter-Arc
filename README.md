@@ -1,32 +1,57 @@
-# React + TypeScript + Vite
+# Winter Arc
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Application personnelle de suivi quotidien, utilisée comme **PWA installée sur l'écran d'accueil iPhone**.
 
-Currently, two official plugins are available:
+Deux fonctionnalités :
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Régime** — pesées, objectif, trajectoire théorique, journal du jour (sport / écart alimentaire / cycle en option).
+- **Apnée** — chronomètre d'apnée statique, statistiques et historique.
 
-## React Compiler
+## Principes
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Aucun backend.** Toutes les données restent sur l'appareil, dans IndexedDB (via Dexie).
+  Elles ne sont ni synchronisées ni envoyées nulle part : la seule sauvegarde est l'export JSON manuel des réglages.
+- **Zéro service payant.** Hébergement statique sur GitHub Pages.
+- **Hors ligne d'abord.** Le service worker précharge l'application ; la mise à jour n'est jamais
+  silencieuse, un bandeau propose de l'appliquer.
 
-## Expanding the Oxlint configuration
+## Développement
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm install
+npm run dev      # serveur de développement
+npm run build    # vérification des types (tsc -b) + build de production
+npm run preview  # sert le build de production en local
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+Le déploiement est automatique sur push vers `main` (voir `.github/workflows/deploy.yml`).
+
+## Organisation du code
+
+```
+src/
+  components/   Composants transverses (Card, PageLayout, BottomSheet, ErrorBoundary…)
+  db/           Schéma Dexie et accès aux données, un fichier par table
+  domain/       Règles métier pures, sans React ni accès base (trajectoire, séries, apnée)
+  features/     Une fonctionnalité = un dossier (home, weight, apnea, settings)
+  utils/        Helpers génériques (dates)
+```
+
+Conventions :
+
+- Styles en fichiers `.css` colocalisés (pas de `style={{…}}`, sauf pour passer une valeur
+  dynamique via une custom property CSS).
+- Les utilitaires CSS partagés par plusieurs features vivent dans `src/index.css`.
+- Commentaires en français, et réservés au **pourquoi** — pas à la paraphrase du code.
+- Les dates sont des jours civils au format `YYYY-MM-DD`, manipulées via `src/utils/date.ts`
+  (jamais `new Date(iso)` directement, qui interpréterait la chaîne en UTC).
+
+## Points d'attention
+
+- **Vite reste en version 6.** `npm create vite@latest` installe Vite 8 + Rolldown, dont le binaire
+  natif ne s'installe pas correctement sous Windows.
+- **`base`, `start_url` et `scope`** dans `vite.config.ts` doivent correspondre au nom du dépôt
+  GitHub (`/Winter-Arc/`), sinon le déploiement GitHub Pages sert des chemins invalides.
+- **IndexedDB n'indexe pas les booléens** : le champ `active` des objectifs est filtré côté JS.
+- Ajouter un champ optionnel non indexé à une table ne nécessite pas de nouvelle version Dexie ;
+  ajouter un **index** ou une table, si.

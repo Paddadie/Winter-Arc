@@ -3,7 +3,8 @@
 }
 
 .day-entry-date-input {
-  font-size: 14px;
+  /* 16px minimum : en dessous, iOS zoome automatiquement au focus du champ. */
+  font-size: 16px;
   padding: 6px 8px;
   border-radius: 8px;
   border: 1px solid var(--color-border);
@@ -62,7 +63,7 @@
   border-radius: var(--radius-m);
   padding: 0 var(--space-l);
   background: var(--color-coral);
-  color: white;
+  color: var(--color-on-accent);
   font-size: 16px;
   font-weight: 700;
 }
@@ -91,17 +92,17 @@
 .chip--success.chip--active {
   border-color: var(--color-success);
   background: var(--color-success);
-  color: white;
+  color: var(--color-on-accent);
 }
 
 .chip--alert.chip--active {
   border-color: var(--color-alert);
   background: var(--color-alert);
-  color: white;
+  color: var(--color-on-accent);
 }
 
 .chip--period.chip--active {
   border-color: var(--color-period);
   background: var(--color-period);
-  color: white;
+  color: var(--color-on-accent);
 }

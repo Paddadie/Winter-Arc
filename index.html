@@ -4,8 +4,38 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
-    <meta name="theme-color" content="#123542" />
+    <!--
+      Pas de maximum-scale / user-scalable=no : bloquer le zoom est un défaut
+      d'accessibilité (WCAG 1.4.4). C'était là pour éviter le zoom automatique
+      d'iOS au focus d'un champ — évité autrement, en gardant tous les champs
+      de saisie à au moins 16px.
+    -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#F5F7F7" />
+    <script>
+      /*
+        Applique le thème avant le premier rendu. Sans ce script, un utilisateur
+        en mode sombre verrait un flash blanc au lancement de la PWA, le temps
+        que le bundle se charge et pose l'attribut.
+        À garder cohérent avec src/features/settings/themePref.ts : même clé de
+        stockage, mêmes couleurs.
+      */
+      (function () {
+        var theme = null;
+        try {
+          theme = localStorage.getItem("winter-arc:theme");
+        } catch (e) {
+          /* stockage indisponible : on retombe sur le réglage système */
+        }
+        if (theme !== "dark" && theme !== "light") {
+          theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        }
+        document.documentElement.dataset.theme = theme;
+        document
+          .querySelector('meta[name="theme-color"]')
+          .setAttribute("content", theme === "dark" ? "#0E1518" : "#F5F7F7");
+      })();
+    </script>
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Winter" />

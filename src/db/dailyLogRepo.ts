@@ -1,6 +1,14 @@
 import { db, type DailyLog } from "../db/schema";
 
-/** Crée ou met à jour le log du jour (une seule entrée par date). */
+/**
+ * Crée ou met à jour le log du jour (une seule entrée par date).
+ *
+ * À la création, les champs absents du patch sont posés à `false` et non
+ * laissés indéfinis : c'est la contrainte assumée du modèle tri-état — dès
+ * qu'on touche une puce d'un jour, les autres passent de "non renseigné" à
+ * "non". Distinguer les trois états par champ demanderait un champ optionnel
+ * par puce, complexité non justifiée pour l'usage.
+ */
 export async function setDailyLog(
   date: string,
   patch: Partial<Pick<DailyLog, "sport" | "foodDeviation" | "period">>

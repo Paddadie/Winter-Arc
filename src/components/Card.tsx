@@ -6,7 +6,8 @@ interface CardProps {
   className?: string;
 }
 
+/** Conteneur de base de l'app : une carte = une section thématique de la page. */
 export function Card({ children, className }: CardProps) {
   const classes = ["card", className].filter(Boolean).join(" ");
-  return <div className={classes}>{children}</div>;
+  return <section className={classes}>{children}</section>;
 }

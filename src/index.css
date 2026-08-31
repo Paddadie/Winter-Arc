@@ -23,6 +23,15 @@
   --color-period-soft: #FBE7EF;
   --color-period-weekend: #E9D6ED; /* jour à la fois week-end et cycle : lavande douce, cohérente avec les autres teintes pastel */
 
+  /*
+   * Texte posé sur un aplat de couleur. Deux jetons et non un seul, parce que
+   * les deux familles d'aplats n'évoluent pas de la même façon en mode sombre :
+   * les accents saturés restent identiques (le blanc reste juste), alors que
+   * --color-depth s'éclaircit et réclame alors un texte foncé.
+   */
+  --color-on-accent: #FFFFFF;
+  --color-on-depth: #FFFFFF;
+
   /* Typographie — SF Pro (système iOS), Rounded pour les chiffres héros */
   --font-body: -apple-system, "SF Pro Text", system-ui, sans-serif;
   --font-display: ui-rounded, "SF Pro Rounded", -apple-system, system-ui, sans-serif;
@@ -36,6 +45,38 @@
   --space-m: 16px;
   --space-l: 24px;
   --space-xl: 32px;
+}
+
+/*
+ * Mode sombre : seuls les NEUTRES (fonds, encre, bordures) et les teintes
+ * pastel de fond sont redéfinis. Les accents saturés (corail, teal, alerte,
+ * succès, cycle) gardent volontairement la même valeur dans les deux modes :
+ * ils servent d'aplats de boutons sous du texte blanc, les éclaircir casserait
+ * ce contraste. Seul --color-depth, trop sombre pour rester lisible sur un
+ * fond sombre, est remonté — d'où --color-on-depth qui bascule en foncé.
+ *
+ * Le thème est piloté par <html data-theme>, jamais directement par une
+ * media query : le réglage système ne sert que de valeur initiale, résolue
+ * en attribut par le script en tête de index.html. Un seul bloc à maintenir,
+ * et le réglage manuel des paramètres l'emporte naturellement.
+ */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --color-surface: #0E1518;
+  --color-surface-raised: #182328;
+  --color-ink: #E7EDEF;
+  --color-ink-muted: #94A8B0;
+  --color-border: #2A383F;
+
+  --color-depth: #6FB3C7;
+  --color-depth-soft: #4C8DA1;
+  --color-on-depth: #0B1518;
+
+  --color-teal-soft: #17323A;
+  --color-coral-soft: #38251A;
+  --color-period-soft: #3A1F2B;
+  --color-period-weekend: #2C2437;
 }
 
 * {
@@ -117,6 +158,7 @@ button {
 }
 
 .close-button {
+  position: relative;
   border: none;
   background: var(--color-surface);
   color: var(--color-ink-muted);
@@ -124,6 +166,16 @@ button {
   height: 32px;
   border-radius: 50%;
   font-size: 15px;
+}
+
+/*
+ * Élargit la zone tactile sans changer l'apparence du bouton : un rond de
+ * 32px est plus petit que la cible de 44px recommandée au doigt sur iPhone.
+ */
+.close-button::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
 }
 
 .sheet-header {

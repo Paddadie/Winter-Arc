@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { PageLayout } from "../../components/PageLayout";
+import { LoadStatusMessage, type LoadStatus } from "../../components/LoadStatusMessage";
 import { Card } from "../../components/Card";
 import { StatBlock } from "./StatBlock";
 import { WeightHistoryChart } from "./WeightHistoryChart";
@@ -8,7 +9,9 @@ import { getActiveGoal } from "../../db/goalRepo";
 import { getAllWeightEntries } from "../../db/weightRepo";
 import { getDailyLogsBetween } from "../../db/dailyLogRepo";
 import { buildWeightSeries, type WeightSeriesPoint } from "../../domain/weightSeries";
-import { todayISO } from "../../utils/date";
+import { todayISO, parseISODate } from "../../utils/date";
+import { useRefreshOnForeground } from "../../utils/useRefreshOnForeground";
+import { formatKg, formatSignedKg } from "./weightFormat";
 import type { WeightEntry, WeightGoal, DailyLog } from "../../db/schema";
 import "./WeightHistoryPage.css";
 
@@ -18,28 +21,24 @@ export function WeightHistoryPage() {
   const [dailyLogs, setDailyLogs] = useState<DailyLog[]>([]);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [visibleRange, setVisibleRange] = useState<[number, number] | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [status, setStatus] = useState<LoadStatus>("loading");
+
+  async function refresh() {
+    const [activeGoal, allEntries] = await Promise.all([getActiveGoal(), getAllWeightEntries()]);
+    const logs = await getDailyLogsBetween(earliestDate(activeGoal, allEntries), todayISO());
+    setGoal(activeGoal);
+    setEntries(allEntries);
+    setDailyLogs(logs);
+    setStatus("ready");
+  }
 
   useEffect(() => {
-    (async () => {
-      const [g, allEntries] = await Promise.all([getActiveGoal(), getAllWeightEntries()]);
-      const rangeStart = earliestDate(g, allEntries);
-      const rangeEnd = todayISO();
-      const logs = await getDailyLogsBetween(rangeStart, rangeEnd);
-      setGoal(g);
-      setEntries(allEntries);
-      setDailyLogs(logs);
-      setLoading(false);
-    })();
+    refresh().catch(() => setStatus("error"));
   }, []);
 
-  if (loading) {
-    return (
-      <PageLayout title="Historique" accentColor="var(--color-coral)" backTo="/regime" backLabel="Régime">
-        <p className="text-muted">Chargement…</p>
-      </PageLayout>
-    );
-  }
+  useRefreshOnForeground(() => {
+    refresh().catch(() => setStatus("error"));
+  });
 
   const rangeStart = earliestDate(goal, entries);
   const rangeEnd = todayISO();
@@ -49,16 +48,24 @@ export function WeightHistoryPage() {
 
   return (
     <PageLayout title="Historique" accentColor="var(--color-coral)" backTo="/regime" backLabel="Régime">
-      <WeightHistoryChart
-        series={series}
-        hasGoal={goal !== null}
-        onSelectDate={setSelectedDate}
-        onVisibleRangeChange={(start, end) => setVisibleRange([start, end])}
-      />
+      {status !== "ready" ? (
+        <LoadStatusMessage status={status} />
+      ) : (
+        <>
+          <WeightHistoryChart
+            series={series}
+            hasGoal={goal !== null}
+            onSelectDate={setSelectedDate}
+            onVisibleRangeChange={(start, end) => setVisibleRange([start, end])}
+          />
 
-      <PeriodStats series={series.slice(visStart, visEnd + 1)} />
+          <PeriodStats series={series.slice(visStart, visEnd + 1)} />
 
-      {selectedPoint && <DayDetailCard point={selectedPoint} onClose={() => setSelectedDate(null)} />}
+          {selectedPoint && (
+            <DayDetailCard point={selectedPoint} onClose={() => setSelectedDate(null)} onChanged={refresh} />
+          )}
+        </>
+      )}
     </PageLayout>
   );
 }
@@ -70,10 +77,16 @@ function earliestDate(goal: WeightGoal | null, entries: WeightEntry[]): string {
   return candidates.reduce((min, d) => (d < min ? d : min));
 }
 
+/**
+ * Statistiques de la plage actuellement visible dans le graphique (zoom du
+ * Brush). Les jours interpolés comptent comme des jours de la plage : ils
+ * sont dessinés dans la courbe, les exclure donnerait des bornes début/fin
+ * incohérentes avec ce que l'utilisateur voit.
+ */
 function PeriodStats({ series }: { series: WeightSeriesPoint[] }) {
-  const realPoints = series.filter((p): p is WeightSeriesPoint & { weightKg: number } => p.weightKg !== null);
+  const pointsWithWeight = series.filter((p): p is WeightSeriesPoint & { weightKg: number } => p.weightKg !== null);
 
-  if (realPoints.length === 0 || series.length === 0) {
+  if (pointsWithWeight.length === 0) {
     return (
       <Card>
         <p className="empty-message">Aucune donnée de poids sur la période affichée.</p>
@@ -81,11 +94,12 @@ function PeriodStats({ series }: { series: WeightSeriesPoint[] }) {
     );
   }
 
-  const startWeight = realPoints[0].weightKg;
-  const endWeight = realPoints[realPoints.length - 1].weightKg;
+  const startWeight = pointsWithWeight[0].weightKg;
+  const endWeight = pointsWithWeight[pointsWithWeight.length - 1].weightKg;
   const variation = Math.round((endWeight - startWeight) * 10) / 10;
-  const minWeight = Math.min(...realPoints.map((p) => p.weightKg));
-  const maxWeight = Math.max(...realPoints.map((p) => p.weightKg));
+  const weights = pointsWithWeight.map((p) => p.weightKg);
+  const minWeight = Math.min(...weights);
+  const maxWeight = Math.max(...weights);
 
   return (
     <Card>
@@ -97,7 +111,7 @@ function PeriodStats({ series }: { series: WeightSeriesPoint[] }) {
         <StatBlock label="Fin" value={formatKg(endWeight)} />
         <StatBlock
           label="Variation"
-          value={`${variation > 0 ? "+" : ""}${variation.toFixed(1).replace(".", ",")} kg`}
+          value={formatSignedKg(variation)}
           variant={variation > 0 ? "alert" : "success"}
         />
         <StatBlock label="Min – Max" value={`${formatKg(minWeight)} – ${formatKg(maxWeight)}`} />
@@ -106,11 +120,6 @@ function PeriodStats({ series }: { series: WeightSeriesPoint[] }) {
   );
 }
 
-function formatKg(kg: number): string {
-  return `${kg.toFixed(1).replace(".", ",")} kg`;
-}
-
 function formatShortDate(iso: string): string {
-  const d = new Date(iso);
-  return d.toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
+  return parseISODate(iso).toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
 }

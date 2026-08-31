@@ -12,10 +12,15 @@
   font-weight: 700;
 }
 
+/*
+ * Bouton inversé : le fond est l'encre, le texte la couleur du fond de page.
+ * Surtout pas --color-on-accent (blanc en dur) : en mode sombre l'encre est
+ * quasi blanche, on obtiendrait du blanc sur blanc.
+ */
 .settings-button--filled {
   border: none;
   background: var(--color-ink);
-  color: white;
+  color: var(--color-surface);
 }
 
 .settings-button--outline {

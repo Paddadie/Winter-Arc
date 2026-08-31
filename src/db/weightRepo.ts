@@ -10,6 +10,11 @@ export async function addWeightEntry(date: string, weightKg: number): Promise<vo
   }
 }
 
+/** Supprime la pesée d'un jour, s'il y en a une. Sans effet sinon. */
+export async function deleteWeightEntry(date: string): Promise<void> {
+  await db.weightEntries.where("date").equals(date).delete();
+}
+
 /** Toutes les entrées, triées par date croissante. */
 export async function getAllWeightEntries(): Promise<WeightEntry[]> {
   return db.weightEntries.orderBy("date").toArray();

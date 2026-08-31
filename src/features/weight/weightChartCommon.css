@@ -1,4 +1,9 @@
-.chart-tooltip-goal {
+.weight-dot-hit-area {
+  cursor: pointer;
+}
+
+.chart-tooltip-goal,
+.chart-tooltip-trend {
   opacity: 0.8;
 }
 

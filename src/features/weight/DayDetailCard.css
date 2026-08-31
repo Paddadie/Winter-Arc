@@ -22,3 +22,86 @@
   font-size: 14px;
   color: var(--color-ink);
 }
+.day-detail-editor {
+  margin-top: var(--space-m);
+  padding-top: var(--space-m);
+  border-top: 1px solid var(--color-border);
+}
+
+.day-detail-editor-row {
+  display: flex;
+  gap: var(--space-s);
+}
+
+.day-detail-editor-input-wrap {
+  position: relative;
+  flex: 1;
+}
+
+.day-detail-editor-input {
+  width: 100%;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 10px 40px 10px 12px;
+  border-radius: var(--radius-s);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-ink);
+}
+
+.day-detail-editor-input--error {
+  border-color: var(--color-alert);
+}
+
+.day-detail-editor-suffix {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-ink-muted);
+  font-size: 14px;
+  font-weight: 600;
+  pointer-events: none;
+}
+
+.day-detail-editor-save {
+  border: none;
+  border-radius: var(--radius-s);
+  padding: 0 var(--space-m);
+  background: var(--color-coral);
+  color: var(--color-on-accent);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.day-detail-editor-save:disabled {
+  opacity: 0.6;
+}
+
+.day-detail-editor-delete {
+  width: 100%;
+  margin-top: var(--space-s);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-s);
+  padding: 10px;
+  background: transparent;
+  color: var(--color-alert);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.day-detail-editor-delete:disabled {
+  opacity: 0.6;
+}
+
+.day-detail-close-button {
+  width: 100%;
+  margin-top: var(--space-m);
+  border: none;
+  border-radius: var(--radius-m);
+  padding: 14px;
+  background: var(--color-surface);
+  color: var(--color-ink-muted);
+  font-size: 15px;
+  font-weight: 600;
+}

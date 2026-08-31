@@ -1,6 +1,14 @@
-/** Date du jour au format ISO "YYYY-MM-DD", en heure locale (pas UTC). */
-export function todayISO(): string {
-  return toISODate(new Date());
+/**
+ * Convertit "YYYY-MM-DD" en Date locale à minuit.
+ *
+ * `new Date("2026-08-11")` interpréterait la chaîne en UTC : dans un fuseau
+ * en retard sur UTC, l'affichage local reculerait d'un jour. Toutes les dates
+ * de l'app sont des jours civils locaux, jamais des instants — d'où ce
+ * parsing explicite, à utiliser partout plutôt que `new Date(iso)`.
+ */
+export function parseISODate(iso: string): Date {
+  const [year, month, day] = iso.split("-").map(Number);
+  return new Date(year, month - 1, day);
 }
 
 /** Convertit une Date en "YYYY-MM-DD" en heure locale. */
@@ -11,12 +19,28 @@ export function toISODate(date: Date): string {
   return `${year}-${month}-${day}`;
 }
 
+/** Date du jour au format ISO "YYYY-MM-DD", en heure locale (pas UTC). */
+export function todayISO(): string {
+  return toISODate(new Date());
+}
+
 /** Ajoute (ou soustrait si négatif) un nombre de jours à une date ISO. */
 export function addDays(isoDate: string, days: number): string {
-  const [y, m, d] = isoDate.split("-").map(Number);
-  const date = new Date(y, m - 1, d);
+  const date = parseISODate(isoDate);
   date.setDate(date.getDate() + days);
   return toISODate(date);
+}
+
+/** Nombre de jours entre deux dates ISO (b - a). */
+export function daysBetween(a: string, b: string): number {
+  const msPerDay = 1000 * 60 * 60 * 24;
+  return Math.round((parseISODate(b).getTime() - parseISODate(a).getTime()) / msPerDay);
+}
+
+/** Vrai si la date ISO tombe un samedi ou un dimanche. */
+export function isWeekend(iso: string): boolean {
+  const day = parseISODate(iso).getDay();
+  return day === 0 || day === 6;
 }
 
 /** Heure actuelle au format "HH:MM", en heure locale. */
@@ -27,11 +51,18 @@ export function nowTimeHHMM(): string {
   return `${hours}:${minutes}`;
 }
 
+/** "JJ/MM" — format compact des axes et infobulles de graphique. */
+export function formatDayMonth(iso: string): string {
+  const [, month, day] = iso.split("-");
+  return `${day}/${month}`;
+}
+
 /** "Aujourd'hui" / "Hier" / date longue (ex: "11 août"), pour un affichage relatif. */
 export function relativeDayLabel(iso: string): string {
-  if (iso === todayISO()) return "Aujourd'hui";
-  if (iso === addDays(todayISO(), -1)) return "Hier";
-  return new Date(iso).toLocaleDateString("fr-FR", { day: "numeric", month: "long" });
+  const today = todayISO();
+  if (iso === today) return "Aujourd'hui";
+  if (iso === addDays(today, -1)) return "Hier";
+  return parseISODate(iso).toLocaleDateString("fr-FR", { day: "numeric", month: "long" });
 }
 
 /**
@@ -41,50 +72,43 @@ export function relativeDayLabel(iso: string): string {
  * non plus (ne montre alors que les années). Suppose `toIso` >= `fromIso`.
  */
 export function formatDurationLabel(fromIso: string, toIso: string): string {
-  const [fy, fm, fd] = fromIso.split("-").map(Number);
-  const [ty, tm, td] = toIso.split("-").map(Number);
+  const [fromYear, fromMonth, fromDay] = fromIso.split("-").map(Number);
+  const [toYear, toMonth, toDay] = toIso.split("-").map(Number);
 
-  let years = ty - fy;
-  let months = tm - fm;
-  let days = td - fd;
+  let years = toYear - fromYear;
+  let months = toMonth - fromMonth;
+  let days = toDay - fromDay;
 
   if (days < 0) {
     months -= 1;
-    days += new Date(ty, tm - 1, 0).getDate(); // nombre de jours du mois précédent `tm`
+    days += new Date(toYear, toMonth - 1, 0).getDate(); // nombre de jours du mois précédent `toMonth`
   }
   if (months < 0) {
     years -= 1;
     months += 12;
   }
+  // Un seul emprunt ne suffit pas toujours : du 31 janvier au 1er mars, on
+  // emprunte les 28 jours de février et il reste -2. Le résultat affiché est
+  // alors "1 mois", ce qui convient ; on borne surtout pour garantir qu'aucun
+  // nombre de jours négatif ne puisse remonter jusqu'à l'affichage.
+  days = Math.max(0, days);
 
   const totalMonths = years * 12 + months;
   const parts: string[] = [];
 
   if (totalMonths > 24) {
-    parts.push(`${years} an${years > 1 ? "s" : ""}`);
+    parts.push(pluralize(years, "an"));
   } else if (totalMonths > 5) {
-    if (years > 0) parts.push(`${years} an${years > 1 ? "s" : ""}`);
+    if (years > 0) parts.push(pluralize(years, "an"));
     if (months > 0) parts.push(`${months} mois`);
   } else {
     if (months > 0) parts.push(`${months} mois`);
-    if (days > 0 || parts.length === 0) parts.push(`${days} jour${days > 1 ? "s" : ""}`);
+    if (days > 0 || parts.length === 0) parts.push(pluralize(days, "jour"));
   }
 
   return parts.join(" ");
 }
 
-/** Vrai si la date ISO tombe un samedi ou un dimanche. */
-export function isWeekend(iso: string): boolean {
-  const [y, m, d] = iso.split("-").map(Number);
-  const day = new Date(y, m - 1, d).getDay();
-  return day === 0 || day === 6;
-}
-
-/** Nombre de jours entre deux dates ISO (b - a). */
-export function daysBetween(a: string, b: string): number {
-  const [ay, am, ad] = a.split("-").map(Number);
-  const [by, bm, bd] = b.split("-").map(Number);
-  const dateA = new Date(ay, am - 1, ad);
-  const dateB = new Date(by, bm - 1, bd);
-  return Math.round((dateB.getTime() - dateA.getTime()) / (1000 * 60 * 60 * 24));
+function pluralize(count: number, singular: string): string {
+  return `${count} ${singular}${count > 1 ? "s" : ""}`;
 }

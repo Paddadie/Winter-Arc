@@ -41,6 +41,12 @@
   margin: 4px 0 0 0;
 }
 
+.home-main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
 .home-tiles {
   display: flex;
   flex-direction: column;

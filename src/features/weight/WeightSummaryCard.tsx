@@ -2,6 +2,7 @@ import { Card } from "../../components/Card";
 import { StatBlock } from "./StatBlock";
 import { todayISO, relativeDayLabel, formatDurationLabel } from "../../utils/date";
 import { remainingKg, daysRemaining, theoreticalWeightAt } from "../../domain/weightTrajectory";
+import { formatKg, formatSignedKg } from "./weightFormat";
 import type { WeightEntry, WeightGoal } from "../../db/schema";
 import "./WeightSummaryCard.css";
 
@@ -17,8 +18,9 @@ interface WeightSummaryCardProps {
  *
  * "Écart objectif" est une distance (toujours positive) jusqu'à l'objectif
  * final. "Écart trajectoire" compare le dernier poids connu au poids
- * théorique du jour même (pas l'objectif final) : négatif si en dessous de
- * la trajectoire prévue (en avance), positif si au-dessus (en retard).
+ * théorique du jour même (pas l'objectif final) : il est donc signé —
+ * négatif si en dessous de la trajectoire prévue (en avance, en vert),
+ * positif si au-dessus (en retard, en rouge).
  */
 export function WeightSummaryCard({ latestEntry, goal }: WeightSummaryCardProps) {
   const remaining = goal && latestEntry ? remainingKg(goal, latestEntry.weightKg) : null;
@@ -30,7 +32,7 @@ export function WeightSummaryCard({ latestEntry, goal }: WeightSummaryCardProps)
 
   return (
     <Card>
-      <p className="weight-summary-label">Dernier poids</p>
+      <h2 className="weight-summary-label">Dernier poids</h2>
       <p className="weight-summary-value">{latestEntry ? formatKg(latestEntry.weightKg) : "—"}</p>
       <p className="weight-summary-date">
         {latestEntry ? relativeDayLabel(latestEntry.date) : "Aucune pesée enregistrée"}
@@ -40,7 +42,7 @@ export function WeightSummaryCard({ latestEntry, goal }: WeightSummaryCardProps)
         <div className="weight-summary-stats-grid">
           <StatBlock
             label="Écart trajectoire"
-            value={trajectoryDiff !== null ? formatKg(trajectoryDiff) : "—"}
+            value={trajectoryDiff !== null ? formatSignedKg(trajectoryDiff) : "—"}
             variant={trajectoryDiff === null ? undefined : trajectoryDiff > 0 ? "alert" : "success"}
           />
           <StatBlock label="Écart objectif" value={remaining !== null ? formatKg(Math.abs(remaining)) : "—"} />
@@ -55,8 +57,4 @@ export function WeightSummaryCard({ latestEntry, goal }: WeightSummaryCardProps)
       )}
     </Card>
   );
-}
-
-function formatKg(kg: number): string {
-  return `${kg.toFixed(1).replace(".", ",")} kg`;
 }
