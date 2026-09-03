@@ -1,8 +1,6 @@
 import { Bar, Cell, Line, YAxis } from "recharts";
-import { formatDayMonth, isWeekend } from "../../utils/date";
-import { formatKg } from "./weightFormat";
+import { isWeekend } from "../../utils/date";
 import type { WeightSeriesPoint } from "../../domain/weightSeries";
-import "../../components/chartTooltip.css";
 import "./weightChartCommon.css";
 
 /**
@@ -149,36 +147,6 @@ function dayHighlightColor(point: WeightSeriesPoint, showPeriod: boolean): strin
   if (isPeriodDay) return "var(--color-period-soft)";
   if (isWeekendDay) return "var(--color-teal-soft)";
   return "transparent";
-}
-
-export function ChartTooltip({
-  active,
-  payload,
-  label,
-}: {
-  active?: boolean;
-  payload?: Array<{ payload: WeightSeriesPoint }>;
-  label?: string;
-}) {
-  if (!active || !payload || payload.length === 0 || !label) return null;
-  const point: WeightSeriesPoint = payload[0].payload;
-  return (
-    <div className="chart-tooltip">
-      <div className="chart-tooltip-title">{formatDayMonth(label)}</div>
-      {point.weightKg !== null && (
-        <div>
-          {point.isReal ? "Mesuré : " : "Estimé : "}
-          {formatKg(point.weightKg)}
-        </div>
-      )}
-      {point.goalWeightKg !== null && (
-        <div className="chart-tooltip-goal">Objectif : {formatKg(point.goalWeightKg)}</div>
-      )}
-      {point.trendWeightKg !== null && (
-        <div className="chart-tooltip-trend">Tendance : {formatKg(point.trendWeightKg)}</div>
-      )}
-    </div>
-  );
 }
 
 export function Legend({

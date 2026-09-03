@@ -14,10 +14,11 @@ export interface WeightSeriesPoint {
   /** Suivi du cycle, si la fonctionnalité est activée dans les réglages. */
   period: boolean | null;
   /**
-   * Droite de tendance calculée sur les pesées réelles, prolongée sur toute
-   * la fenêtre (jours futurs compris). Volontairement NON arrondie au
-   * dixième, contrairement aux autres poids : sur une fenêtre courte la
-   * pente est faible, et arrondir transformerait la droite en escalier.
+   * Droite de tendance calculée sur les pesées réelles des deux dernières
+   * semaines de mesure, et null les jours qu'elle ne couvre pas (voir
+   * `trendWeightAt`). Volontairement NON arrondie au dixième, contrairement
+   * aux autres poids : sur une fenêtre courte la pente est faible, et
+   * arrondir transformerait la droite en escalier.
    */
   trendWeightKg: number | null;
 }
@@ -31,7 +32,9 @@ export interface WeightSeriesPoint {
  *   (on ne fabrique pas de données hors de la plage connue)
  * - goalWeightKg = poids théorique selon l'objectif actif, ou null si aucun objectif
  * - sport/foodDeviation/period = valeur du journal du jour, ou null si aucun journal saisi
- * - trendWeightKg = droite de tendance des pesées réelles, ou null si moins de deux pesées
+ * - trendWeightKg = droite de tendance des pesées réelles récentes, ou null
+ *   hors de la plage qu'elle couvre (moins de deux pesées, jour antérieur à
+ *   la fenêtre de tendance ou trop postérieur à la dernière pesée)
  *
  * `entries` doit contenir toutes les mesures utiles, y compris celles hors de
  * [startDate, endDate], car l'interpolation aux bords de la fenêtre a besoin

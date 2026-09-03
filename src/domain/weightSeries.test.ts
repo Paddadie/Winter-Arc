@@ -103,9 +103,40 @@ describe("buildWeightSeries", () => {
       expect(series.every((p) => p.trendWeightKg === null)).toBe(true);
     });
 
-    it("couvre toute la fenêtre, y compris les jours sans pesée", () => {
+    it("couvre les jours sans pesée et les jours à venir proches", () => {
       const series = buildWeightSeries(entries(["2026-01-01", 90], ["2026-01-03", 88]), null, "2026-01-01", "2026-01-05");
       expect(series.map((p) => p.trendWeightKg)).toEqual([90, 89, 88, 87, 86]);
+    });
+
+    // La régression part des pesées ENREGISTRÉES, jamais de ce que la fenêtre
+    // laisse voir : startDate/endDate choisissent les jours dessinés, pas les
+    // données du calcul. Une fenêtre plus étroite doit donner exactement la
+    // même droite.
+    it("calcule la même droite quelle que soit la fenêtre affichée", () => {
+      const measures = entries(["2026-02-01", 90], ["2026-02-06", 89.4], ["2026-02-11", 88]);
+      const large = buildWeightSeries(measures, null, "2025-06-01", "2026-02-11");
+      const etroite = buildWeightSeries(measures, null, "2026-02-10", "2026-02-11");
+      const trendOn = (series: typeof large, date: string) =>
+        series.find((p) => p.date === date)!.trendWeightKg;
+
+      expect(trendOn(etroite, "2026-02-10")).toBe(trendOn(large, "2026-02-10"));
+      expect(trendOn(etroite, "2026-02-11")).toBe(trendOn(large, "2026-02-11"));
+    });
+
+    // La droite ne décrit que les deux dernières semaines de mesure : la
+    // tracer sur des mois d'historique ferait passer pour une tendance une
+    // extrapolation qu'aucune donnée ne soutient.
+    it("laisse sans tendance les jours hors de la fenêtre de tendance", () => {
+      const series = buildWeightSeries(
+        entries(["2026-01-15", 92], ["2026-02-01", 90], ["2026-02-11", 88]),
+        null,
+        "2026-01-14",
+        "2026-02-20"
+      );
+      const covered = series.filter((p) => p.trendWeightKg !== null).map((p) => p.date);
+      // De la première pesée retenue (1er février) à une semaine après la dernière.
+      expect(covered[0]).toBe("2026-02-01");
+      expect(covered[covered.length - 1]).toBe("2026-02-18");
     });
 
     // Non arrondie, contrairement aux autres poids : sur une pente faible,

@@ -5,7 +5,6 @@ import {
   Line,
   XAxis,
   YAxis,
-  Tooltip,
   CartesianGrid,
   ReferenceLine,
   Brush,
@@ -13,7 +12,7 @@ import {
 import { Card } from "../../components/Card";
 import { CardLabel } from "../../components/CardLabel";
 import { todayISO, formatDayMonth } from "../../utils/date";
-import { WeightDot, ChartTooltip, Legend, DayHighlights, TrendLine } from "./weightChartCommon";
+import { WeightDot, Legend, DayHighlights, TrendLine } from "./weightChartCommon";
 import { isPeriodTrackingEnabled } from "./periodTrackingPref";
 import type { WeightSeriesPoint } from "../../domain/weightSeries";
 import "./WeightHistoryChart.css";
@@ -101,7 +100,6 @@ export function WeightHistoryChart({ series, hasGoal, onSelectDate, onVisibleRan
               tickLine={false}
               width={40}
             />
-            <Tooltip content={<ChartTooltip />} />
             <ReferenceLine x={todayISO()} stroke="var(--color-ink-muted)" strokeDasharray="3 3" />
 
             {hasGoal && (
@@ -126,7 +124,7 @@ export function WeightHistoryChart({ series, hasGoal, onSelectDate, onVisibleRan
               stroke="var(--color-coral)"
               strokeWidth={2.5}
               dot={<WeightDot onSelect={onSelectDate} />}
-              activeDot={{ r: 5 }}
+              activeDot={false}
               isAnimationActive={false}
               connectNulls={false}
             />

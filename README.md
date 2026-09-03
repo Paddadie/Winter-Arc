@@ -19,12 +19,15 @@ Deux fonctionnalités :
 
 ```bash
 npm install
-npm run dev      # serveur de développement
-npm run build    # vérification des types (tsc -b) + build de production
-npm run preview  # sert le build de production en local
+npm run dev        # serveur de développement
+npm test           # tests unitaires (Vitest)
+npm run test:watch # tests relancés à chaque modification
+npm run build      # vérification des types (tsc -b) + build de production
+npm run preview    # sert le build de production en local
 ```
 
-Le déploiement est automatique sur push vers `main` (voir `.github/workflows/deploy.yml`).
+Le déploiement est automatique sur push vers `main` : la CI joue les tests puis le build
+(voir `.github/workflows/deploy.yml`).
 
 ## Organisation du code
 
