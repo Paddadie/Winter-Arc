@@ -5,6 +5,7 @@ import { Tile } from "./Tile";
 import { StreakGrid } from "./StreakGrid";
 import { getHiddenTileIds } from "./tileVisibility";
 import { getLastActivityDates } from "./lastActivity";
+import { getDoneTodayFlags } from "./todayCompletion";
 import { buildReminderLabel } from "./featureReminder";
 import { useRefreshOnForeground } from "../../utils/useRefreshOnForeground";
 import { todayISO } from "../../utils/date";
@@ -13,11 +14,18 @@ import "./HomePage.css";
 export function HomePage() {
   const navigate = useNavigate();
   const [lastActivity, setLastActivity] = useState<Record<FeatureId, string | null> | null>(null);
+  const [doneToday, setDoneToday] = useState<Record<FeatureId, boolean> | null>(null);
 
   function refresh() {
-    getLastActivityDates()
-      .then(setLastActivity)
-      .catch(() => setLastActivity(null));
+    Promise.all([getLastActivityDates(), getDoneTodayFlags(todayISO())])
+      .then(([activity, done]) => {
+        setLastActivity(activity);
+        setDoneToday(done);
+      })
+      .catch(() => {
+        setLastActivity(null);
+        setDoneToday(null);
+      });
   }
 
   useEffect(refresh, []);
@@ -47,7 +55,7 @@ export function HomePage() {
             <Tile
               key={tile.id}
               tile={tile}
-              pendingToday={lastActivity !== null && lastActivity[tile.id] !== today}
+              pendingToday={doneToday !== null && !doneToday[tile.id]}
               reminder={lastActivity ? buildReminderLabel(tile.reminder, lastActivity[tile.id], today) : null}
             />
           ))}

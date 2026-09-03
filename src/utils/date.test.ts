@@ -5,6 +5,7 @@ import {
   formatDayMonth,
   formatDurationLabel,
   isWeekend,
+  missingDatesInRange,
   nowTimeHHMM,
   parseISODate,
   relativeDayLabel,
@@ -163,5 +164,39 @@ describe("formatDurationLabel", () => {
     expect(formatDurationLabel("2026-01-31", "2026-03-01")).toBe("1 mois");
     expect(formatDurationLabel("2026-03-31", "2026-05-01")).toBe("1 mois");
     expect(formatDurationLabel("2026-01-31", "2026-02-01")).toBe("1 jour");
+  });
+});
+
+describe("missingDatesInRange", () => {
+  it("liste les jours absents, bornes incluses", () => {
+    expect(missingDatesInRange(["2026-01-02"], "2026-01-01", "2026-01-03")).toEqual([
+      "2026-01-01",
+      "2026-01-03",
+    ]);
+  });
+
+  it("ne renvoie rien quand la plage est déjà couverte", () => {
+    expect(missingDatesInRange(["2026-01-01", "2026-01-02"], "2026-01-01", "2026-01-02")).toEqual([]);
+  });
+
+  it("ne renvoie rien quand la fin précède le début", () => {
+    // Cas du tout premier jour d'utilisation : il n'y a aucun passé à combler.
+    expect(missingDatesInRange([], "2026-01-02", "2026-01-01")).toEqual([]);
+  });
+
+  it("ignore les dates connues hors de la plage", () => {
+    expect(missingDatesInRange(["2025-12-31", "2026-01-05"], "2026-01-01", "2026-01-02")).toEqual([
+      "2026-01-01",
+      "2026-01-02",
+    ]);
+  });
+
+  it("traverse un changement de mois", () => {
+    expect(missingDatesInRange([], "2026-01-30", "2026-02-02")).toEqual([
+      "2026-01-30",
+      "2026-01-31",
+      "2026-02-01",
+      "2026-02-02",
+    ]);
   });
 });

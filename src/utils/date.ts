@@ -37,6 +37,19 @@ export function daysBetween(a: string, b: string): number {
   return Math.round((parseISODate(b).getTime() - parseISODate(a).getTime()) / msPerDay);
 }
 
+/**
+ * Jours de [startDate, endDate] (bornes incluses) absents de `knownDates`.
+ * Liste vide si la plage est vide ou entièrement couverte.
+ */
+export function missingDatesInRange(knownDates: string[], startDate: string, endDate: string): string[] {
+  const known = new Set(knownDates);
+  const missing: string[] = [];
+  for (let date = startDate; date <= endDate; date = addDays(date, 1)) {
+    if (!known.has(date)) missing.push(date);
+  }
+  return missing;
+}
+
 /** Vrai si la date ISO tombe un samedi ou un dimanche. */
 export function isWeekend(iso: string): boolean {
   const day = parseISODate(iso).getDay();

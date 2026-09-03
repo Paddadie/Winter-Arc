@@ -8,9 +8,10 @@ import { WeightChart } from "./WeightChart";
 import { DayDetailCard } from "./DayDetailCard";
 import { getActiveGoal } from "../../db/goalRepo";
 import { getAllWeightEntries, getLatestWeightEntry } from "../../db/weightRepo";
-import { getDailyLogsBetween } from "../../db/dailyLogRepo";
+import { backfillPastDailyLogs, getDailyLogsBetween } from "../../db/dailyLogRepo";
 import { buildWeightSeries } from "../../domain/weightSeries";
 import { todayISO, addDays } from "../../utils/date";
+import { trackingStartDate } from "./trackingStart";
 import { useRefreshOnForeground } from "../../utils/useRefreshOnForeground";
 import type { WeightEntry, WeightGoal, DailyLog } from "../../db/schema";
 import "./WeightPage.css";
@@ -39,12 +40,16 @@ export function WeightPage() {
   const windowEnd = addDays(todayISO(), WINDOW_DAYS_AFTER);
 
   async function refresh(): Promise<WeightGoal | null> {
-    const [activeGoal, allEntries, latest, logs] = await Promise.all([
+    const [activeGoal, allEntries, latest] = await Promise.all([
       getActiveGoal(),
       getAllWeightEntries(),
       getLatestWeightEntry(),
-      getDailyLogsBetween(windowStart, windowEnd),
     ]);
+    // Matérialise les journaux des jours passés restés vides AVANT de les
+    // lire : un jour révolu sans saisie vaut "ni sport ni écart", et cette
+    // vérité doit être en base, pas seulement à l'écran.
+    await backfillPastDailyLogs(trackingStartDate(activeGoal, allEntries), addDays(todayISO(), -1));
+    const logs = await getDailyLogsBetween(windowStart, windowEnd);
     setGoal(activeGoal);
     setEntries(allEntries);
     setLatestEntry(latest);
@@ -68,7 +73,10 @@ export function WeightPage() {
   });
 
   const series = buildWeightSeries(entries, goal, windowStart, windowEnd, dailyLogs);
-  const selectedPoint = selectedDate ? series.find((p) => p.date === selectedDate) ?? null : null;
+  // Index plutôt que find : les jours voisins servent de bornes au balayage
+  // de la fiche du jour, qui ne sort jamais de la fenêtre affichée.
+  const selectedIndex = selectedDate ? series.findIndex((p) => p.date === selectedDate) : -1;
+  const selectedPoint = selectedIndex >= 0 ? series[selectedIndex] : null;
 
   return (
     <PageLayout
@@ -105,7 +113,14 @@ export function WeightPage() {
           <WeightChart series={series} hasGoal={goal !== null} onSelectDate={setSelectedDate} />
 
           {selectedPoint && (
-            <DayDetailCard point={selectedPoint} onClose={() => setSelectedDate(null)} onChanged={refresh} />
+            <DayDetailCard
+              point={selectedPoint}
+              onClose={() => setSelectedDate(null)}
+              onChanged={refresh}
+              previousDate={series[selectedIndex - 1]?.date ?? null}
+              nextDate={series[selectedIndex + 1]?.date ?? null}
+              onNavigate={setSelectedDate}
+            />
           )}
         </>
       )}

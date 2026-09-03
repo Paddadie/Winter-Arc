@@ -22,6 +22,62 @@
   font-size: 14px;
   color: var(--color-ink);
 }
+
+/*
+ * Valeur basculable : elle doit se lire comme la valeur d'à côté, tout en
+ * montrant qu'on peut la toucher. D'où le cadre léger plutôt qu'un bouton
+ * plein, et une zone tactile élargie au-delà du texte, souvent très court
+ * ("Non"), qui serait sinon difficile à viser au pouce.
+ */
+.detail-row-toggle {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-s);
+  background: var(--color-surface);
+  padding: 6px 14px;
+  margin: -6px 0;
+  font-family: inherit;
+}
+
+/*
+ * Glissement d'un jour à l'autre : le nouveau contenu entre du côté d'où
+ * vient le geste. Court et discret — la fiche reste au même endroit, seul son
+ * contenu change, une animation trop ample donnerait l'impression que c'est
+ * la fiche entière qui part.
+ */
+@keyframes day-detail-slide-from-right {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+}
+
+@keyframes day-detail-slide-from-left {
+  from {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+}
+
+.day-detail-slide--from-right {
+  animation: day-detail-slide-from-right 180ms ease-out;
+}
+
+.day-detail-slide--from-left {
+  animation: day-detail-slide-from-left 180ms ease-out;
+}
+
+/* Le décalage horizontal débordé doit être rogné, sinon il élargit la page. */
+.day-detail-swipe-area {
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .day-detail-slide--from-right,
+  .day-detail-slide--from-left {
+    animation: none;
+  }
+}
+
 .day-detail-editor {
   margin-top: var(--space-m);
   padding-top: var(--space-m);

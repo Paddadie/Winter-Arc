@@ -20,7 +20,9 @@ interface TileProps {
 
 export function Tile({ tile, pendingToday, reminder }: TileProps) {
   const navigate = useNavigate();
-  const status = [reminder, pendingToday ? "rien enregistré aujourd'hui" : null].filter(Boolean).join(", ");
+  // "à compléter" et non "rien enregistré" : une tuile peut avoir reçu une
+  // partie de sa journée (la pesée) et garder sa pastille pour le reste.
+  const status = [reminder, pendingToday ? "à compléter aujourd'hui" : null].filter(Boolean).join(", ");
 
   return (
     <button

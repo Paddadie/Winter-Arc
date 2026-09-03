@@ -7,9 +7,10 @@ import { WeightHistoryChart } from "./WeightHistoryChart";
 import { DayDetailCard } from "./DayDetailCard";
 import { getActiveGoal } from "../../db/goalRepo";
 import { getAllWeightEntries } from "../../db/weightRepo";
-import { getDailyLogsBetween } from "../../db/dailyLogRepo";
+import { backfillPastDailyLogs, getDailyLogsBetween } from "../../db/dailyLogRepo";
 import { buildWeightSeries, type WeightSeriesPoint } from "../../domain/weightSeries";
-import { todayISO, parseISODate } from "../../utils/date";
+import { todayISO, parseISODate, addDays } from "../../utils/date";
+import { trackingStartDate } from "./trackingStart";
 import { useRefreshOnForeground } from "../../utils/useRefreshOnForeground";
 import { formatKg, formatSignedKg } from "./weightFormat";
 import type { WeightEntry, WeightGoal, DailyLog } from "../../db/schema";
@@ -25,7 +26,11 @@ export function WeightHistoryPage() {
 
   async function refresh() {
     const [activeGoal, allEntries] = await Promise.all([getActiveGoal(), getAllWeightEntries()]);
-    const logs = await getDailyLogsBetween(earliestDate(activeGoal, allEntries), todayISO());
+    // Avant de lire le journal : matérialiser les jours passés restés vides,
+    // pour qu'ils se lisent "non" partout et pas seulement à l'affichage.
+    const start = trackingStartDate(activeGoal, allEntries);
+    await backfillPastDailyLogs(start, addDays(todayISO(), -1));
+    const logs = await getDailyLogsBetween(start, todayISO());
     setGoal(activeGoal);
     setEntries(allEntries);
     setDailyLogs(logs);
@@ -40,10 +45,13 @@ export function WeightHistoryPage() {
     refresh().catch(() => setStatus("error"));
   });
 
-  const rangeStart = earliestDate(goal, entries);
+  const rangeStart = trackingStartDate(goal, entries);
   const rangeEnd = todayISO();
   const series = buildWeightSeries(entries, goal, rangeStart, rangeEnd, dailyLogs);
-  const selectedPoint = selectedDate ? series.find((p) => p.date === selectedDate) ?? null : null;
+  // Index plutôt que find : les jours voisins servent de bornes au balayage
+  // de la fiche du jour, qui ne sort jamais de la plage affichée.
+  const selectedIndex = selectedDate ? series.findIndex((p) => p.date === selectedDate) : -1;
+  const selectedPoint = selectedIndex >= 0 ? series[selectedIndex] : null;
   const [visStart, visEnd] = visibleRange ?? [0, series.length - 1];
 
   return (
@@ -62,19 +70,19 @@ export function WeightHistoryPage() {
           <PeriodStats series={series.slice(visStart, visEnd + 1)} />
 
           {selectedPoint && (
-            <DayDetailCard point={selectedPoint} onClose={() => setSelectedDate(null)} onChanged={refresh} />
+            <DayDetailCard
+              point={selectedPoint}
+              onClose={() => setSelectedDate(null)}
+              onChanged={refresh}
+              previousDate={series[selectedIndex - 1]?.date ?? null}
+              nextDate={series[selectedIndex + 1]?.date ?? null}
+              onNavigate={setSelectedDate}
+            />
           )}
         </>
       )}
     </PageLayout>
   );
-}
-
-/** Début de la fenêtre affichée : le plus ancien entre le début de l'objectif et la première pesée. */
-function earliestDate(goal: WeightGoal | null, entries: WeightEntry[]): string {
-  const candidates = [goal?.startDate, entries[0]?.date].filter((d): d is string => d != null);
-  if (candidates.length === 0) return todayISO();
-  return candidates.reduce((min, d) => (d < min ? d : min));
 }
 
 /**
