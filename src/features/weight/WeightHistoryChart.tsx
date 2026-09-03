@@ -37,6 +37,17 @@ export function WeightHistoryChart({ series, hasGoal, onSelectDate, onVisibleRan
   const hasAnyWeight = series.some((p) => p.weightKg !== null);
   const hasTrend = series.some((p) => p.trendWeightKg !== null);
 
+  // Échelle Y calculée sur les poids et l'objectif SEULEMENT, jamais sur la
+  // droite de tendance : sa pente vient de deux semaines mais elle est tracée
+  // sur tout l'historique, donc elle quitte le cadre très vite (0,1 kg/jour
+  // sur un an = 36 kg). La laisser entrer dans le domaine écraserait la courbe
+  // de poids en un trait plat. `allowDataOverflow` la fait couper net au bord
+  // du cadre au lieu de déborder sur les étiquettes.
+  const scaleWeights = series.flatMap((p) =>
+    [p.weightKg, p.goalWeightKg].filter((value): value is number => value !== null)
+  );
+  const yDomain: [number, number] = [Math.min(...scaleWeights) - 1, Math.max(...scaleWeights) + 1];
+
   // Intervalle de ticks adapté à la longueur de la série, pour garder
   // un axe lisible que l'historique couvre quelques semaines ou un an.
   const tickInterval = Math.max(0, Math.ceil(series.length / 7) - 1);
@@ -93,7 +104,8 @@ export function WeightHistoryChart({ series, hasGoal, onSelectDate, onVisibleRan
               tickLine={false}
             />
             <YAxis
-              domain={["dataMin - 1", "dataMax + 1"]}
+              domain={yDomain}
+              allowDataOverflow
               allowDecimals={false}
               tick={{ fontSize: 11, fill: "var(--color-ink-muted)" }}
               axisLine={false}

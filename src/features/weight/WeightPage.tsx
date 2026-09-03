@@ -15,9 +15,13 @@ import { useRefreshOnForeground } from "../../utils/useRefreshOnForeground";
 import type { WeightEntry, WeightGoal, DailyLog } from "../../db/schema";
 import "./WeightPage.css";
 
-/** Fenêtre du graphique "Évolution récente" : le passé proche, et quelques jours d'avance sur la trajectoire. */
-const WINDOW_DAYS_BEFORE = 15;
-const WINDOW_DAYS_AFTER = 5;
+/**
+ * Fenêtre du graphique "Évolution récente" : les deux dernières semaines, et
+ * trois jours d'avance sur la trajectoire — assez pour lire où mène
+ * l'objectif, sans une bande de futur vide qui écrase le passé utile.
+ */
+const WINDOW_DAYS_BEFORE = 14;
+const WINDOW_DAYS_AFTER = 3;
 
 export function WeightPage() {
   const [goal, setGoal] = useState<WeightGoal | null>(null);

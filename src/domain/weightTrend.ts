@@ -13,15 +13,6 @@ import type { WeightEntry } from "../db/schema";
  */
 export const TREND_WINDOW_DAYS = 14;
 
-/**
- * Nombre de jours pendant lesquels la droite est prolongée après la dernière
- * pesée. Volontairement la moitié de la fenêtre : une projection ne devrait
- * pas courir plus loin que la moitié de la période qui la fonde. Sans cette
- * borne, une tendance vieille de plusieurs semaines continuerait d'être tracée
- * jusqu'au bord du graphique, très loin de la dernière donnée réelle.
- */
-const TREND_FORECAST_DAYS = 7;
-
 export interface WeightTrend {
   /** Date de référence des abscisses (x = 0), pour éviter de manipuler des timestamps. */
   originDate: string;
@@ -29,8 +20,6 @@ export interface WeightTrend {
   slopeKgPerDay: number;
   /** Poids estimé par la droite à `originDate`. */
   interceptKg: number;
-  /** Dernière pesée prise en compte, au-delà de laquelle la droite s'arrête vite. */
-  lastEntryDate: string;
 }
 
 /**
@@ -78,17 +67,20 @@ export function computeWeightTrend(entries: WeightEntry[]): WeightTrend | null {
   const slopeKgPerDay = (count * sumXY - sumX * sumY) / denominator;
   const interceptKg = (sumY - slopeKgPerDay * sumX) / count;
 
-  return { originDate, slopeKgPerDay, interceptKg, lastEntryDate };
+  return { originDate, slopeKgPerDay, interceptKg };
 }
 
 /**
- * Poids prédit par la droite de tendance à une date donnée, ou null en dehors
- * de la plage où elle a du sens : avant la première pesée de la fenêtre (la
- * droite ne dit rien d'un passé qu'elle n'a pas observé) et au-delà de
- * `TREND_FORECAST_DAYS` après la dernière pesée.
+ * Poids prédit par la droite de tendance à une date donnée, passée ou future.
+ *
+ * La droite est volontairement prolongée bien au-delà des deux semaines qui
+ * l'ont calculée : elle doit traverser toute la largeur du graphique, une
+ * droite qui s'arrête en cours de route se lisant comme une donnée manquante.
+ * En contrepartie, l'échelle verticale des graphiques est calculée SANS elle
+ * (voir `WeightChart` / `WeightHistoryChart`) : sur un long historique
+ * l'extrapolation sort très vite du cadre, et elle écraserait la courbe de
+ * poids si elle entrait dans le calcul du domaine.
  */
-export function trendWeightAt(trend: WeightTrend, date: string): number | null {
-  if (date < trend.originDate) return null;
-  if (date > addDays(trend.lastEntryDate, TREND_FORECAST_DAYS)) return null;
+export function trendWeightAt(trend: WeightTrend, date: string): number {
   return trend.interceptKg + trend.slopeKgPerDay * daysBetween(trend.originDate, date);
 }

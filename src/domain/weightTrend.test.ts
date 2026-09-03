@@ -73,19 +73,12 @@ describe("computeWeightTrend", () => {
 });
 
 describe("trendWeightAt", () => {
-  it("comble les jours sans pesée à l'intérieur de la période mesurée", () => {
+  it("prolonge la droite avant et après la période mesurée", () => {
     const trend = computeWeightTrend(entries(["2026-01-01", 90], ["2026-01-11", 80]))!;
     expect(trendWeightAt(trend, "2026-01-06")).toBeCloseTo(85, 10);
-  });
-
-  it("prolonge la droite jusqu'à une semaine après la dernière pesée, pas au-delà", () => {
-    const trend = computeWeightTrend(entries(["2026-01-01", 90], ["2026-01-11", 80]))!;
-    expect(trendWeightAt(trend, "2026-01-18")).toBeCloseTo(73, 10);
-    expect(trendWeightAt(trend, "2026-01-19")).toBeNull();
-  });
-
-  it("ne remonte pas avant la première pesée de la fenêtre", () => {
-    const trend = computeWeightTrend(entries(["2026-01-01", 90], ["2026-01-11", 80]))!;
-    expect(trendWeightAt(trend, "2025-12-31")).toBeNull();
+    // Extrapolation volontaire dans les deux sens : la droite traverse toute
+    // la largeur du graphique, sans jamais s'interrompre en cours de route.
+    expect(trendWeightAt(trend, "2026-01-21")).toBeCloseTo(70, 10);
+    expect(trendWeightAt(trend, "2025-12-31")).toBeCloseTo(91, 10);
   });
 });

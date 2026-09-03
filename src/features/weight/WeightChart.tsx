@@ -26,13 +26,24 @@ export function WeightChart({ series, hasGoal, onSelectDate }: WeightChartProps)
   const navigate = useNavigate();
   const hasAnyWeight = series.some((p) => p.weightKg !== null);
   const hasTrend = series.some((p) => p.trendWeightKg !== null);
-  // Dernier poids connu (réel ou estimé) : sert d'ancre pour une échelle Y
-  // resserrée autour de la valeur actuelle plutôt qu'un dataMin/dataMax
-  // auto-calculé, qui peut produire des graduations à virgule difficiles à
-  // lire sur un axe étroit.
-  const referenceWeight = [...series].reverse().find((p) => p.weightKg !== null)?.weightKg ?? null;
+  // Échelle Y cadrée sur les poids RÉELLEMENT tracés dans la fenêtre (pesées
+  // et jours interpolés), à bornes entières pour garder des graduations
+  // lisibles sur un axe étroit — un dataMin/dataMax auto produit des
+  // graduations à virgule. Ni l'objectif ni la tendance n'entrent dans le
+  // calcul : tous deux peuvent s'éloigner beaucoup des pesées et écraseraient
+  // la courbe de poids, qui est le sujet du graphique.
+  //
+  // Un kilo entier sous la pesée la plus basse. En haut, 0,5 kg de marge AVANT
+  // l'arrondi : la pastille « écart » est dessinée 13 px au-dessus du point et
+  // le rognage la couperait si le point le plus lourd frôlait le bord.
+  const shownWeights = series.map((p) => p.weightKg).filter((weight): weight is number => weight !== null);
   const yDomain: [number | string, number | string] =
-    referenceWeight !== null ? [referenceWeight - 1.5, referenceWeight + 3] : ["dataMin - 1", "dataMax + 1"];
+    shownWeights.length > 0
+      ? [Math.floor(Math.min(...shownWeights)) - 1, Math.ceil(Math.max(...shownWeights) + 0.5)]
+      : ["dataMin - 1", "dataMax + 1"];
+  // `allowDataOverflow` : sans lui, Recharts ne pose aucun clip-path et une
+  // valeur hors domaine — la tendance prolongée jusqu'au bord gauche,
+  // notamment — se dessine PAR-DESSUS le titre et l'axe.
 
   return (
     <Card className="card--flat">
@@ -61,6 +72,7 @@ export function WeightChart({ series, hasGoal, onSelectDate }: WeightChartProps)
               />
               <YAxis
                 domain={yDomain}
+                allowDataOverflow
                 allowDecimals={false}
                 tick={{ fontSize: 11, fill: "var(--color-ink-muted)" }}
                 axisLine={false}

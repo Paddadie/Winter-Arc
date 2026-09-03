@@ -123,20 +123,20 @@ describe("buildWeightSeries", () => {
       expect(trendOn(etroite, "2026-02-11")).toBe(trendOn(large, "2026-02-11"));
     });
 
-    // La droite ne décrit que les deux dernières semaines de mesure : la
-    // tracer sur des mois d'historique ferait passer pour une tendance une
-    // extrapolation qu'aucune donnée ne soutient.
-    it("laisse sans tendance les jours hors de la fenêtre de tendance", () => {
+    // La pente ne vient que des deux dernières semaines, mais la droite est
+    // tracée sur TOUTE la fenêtre : une droite qui s'arrête en cours de route
+    // se lit comme une donnée manquante.
+    it("prolonge la tendance sur toute la fenêtre, au-delà des quatorze jours", () => {
       const series = buildWeightSeries(
         entries(["2026-01-15", 92], ["2026-02-01", 90], ["2026-02-11", 88]),
         null,
         "2026-01-14",
         "2026-02-20"
       );
-      const covered = series.filter((p) => p.trendWeightKg !== null).map((p) => p.date);
-      // De la première pesée retenue (1er février) à une semaine après la dernière.
-      expect(covered[0]).toBe("2026-02-01");
-      expect(covered[covered.length - 1]).toBe("2026-02-18");
+      expect(series.every((p) => p.trendWeightKg !== null)).toBe(true);
+      // Pente des deux dernières semaines (−0,2 kg/j) prolongée en arrière :
+      // le 31 janvier vaut 90,2 kg, sans que la pesée du 15 janvier ne pèse.
+      expect(series.find((p) => p.date === "2026-01-31")!.trendWeightKg).toBeCloseTo(90.2, 10);
     });
 
     // Non arrondie, contrairement aux autres poids : sur une pente faible,
