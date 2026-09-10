@@ -85,6 +85,20 @@ export function WeightDot(props: {
 /** Écart vertical entre le point de mesure et ses pastilles sport/écart. */
 const MARKER_OFFSET = 13;
 
+/** Rayon du disque coloré d'une pastille. */
+const MARKER_RADIUS = 3;
+
+/**
+ * Rayon du halo opaque dessiné DERRIÈRE la pastille, qui interrompt net toute
+ * ligne passant dessous — objectif en pointillé, tendance ou courbe de poids.
+ *
+ * Un halo se dessine en disque de fond, jamais en `stroke` : un contour SVG
+ * est centré sur son tracé, donc l'ancien `strokeWidth={1.5}` sur un cercle
+ * de rayon 3 ne débordait que de 0,75 px du disque coloré. Beaucoup trop fin
+ * pour couper un pointillé de 2 px, dans lequel la pastille se noyait.
+ */
+const MARKER_HALO_RADIUS = 5.5;
+
 /**
  * Une pastille sport/écart, positionnée verticalement par rapport au point
  * (écart au-dessus de la courbe, sport en dessous) pour rester lisible sur
@@ -94,21 +108,17 @@ const MARKER_OFFSET = 13;
  * visuelle. Le détail complet des trois états reste disponible dans la
  * fiche du jour.
  *
- * Le cerne couleur fond détache la pastille de la courbe : sur une forte
- * variation de poids d'un jour à l'autre, le trait passe juste à côté et
- * sans ce cerne les deux se confondent.
+ * Les pastilles étant dessinées avec les points de la courbe de poids, donc
+ * après les autres lignes, le halo les recouvre : la ligne réapparaît de
+ * l'autre côté de la pastille.
  */
 function DayMarker({ cx, cy, shown, color }: { cx: number; cy: number; shown: boolean; color: string }) {
   if (!shown) return null;
   return (
-    <circle
-      cx={cx}
-      cy={cy}
-      r={3}
-      fill={color}
-      stroke="var(--color-surface-raised)"
-      strokeWidth={1.5}
-    />
+    <>
+      <circle cx={cx} cy={cy} r={MARKER_HALO_RADIUS} fill="var(--color-surface-raised)" />
+      <circle cx={cx} cy={cy} r={MARKER_RADIUS} fill={color} />
+    </>
   );
 }
 
