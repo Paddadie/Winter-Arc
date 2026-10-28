@@ -7,11 +7,13 @@ import { todayISO } from "../../utils/date";
 import { useRefreshOnForeground } from "../../utils/useRefreshOnForeground";
 import { isPeriodTrackingEnabled } from "./periodTrackingPref";
 import { formatKgValue } from "./weightFormat";
-import type { WeightEntry } from "../../db/schema";
+import type { DailyLog, WeightEntry } from "../../db/schema";
 import "./DayEntryCard.css";
 
 interface DayEntryCardProps {
   entries: WeightEntry[];
+  /** Journaux chargés par la page : sert uniquement de signal de rechargement. */
+  dailyLogs: DailyLog[];
   onSaved: () => void;
 }
 
@@ -22,7 +24,7 @@ interface DayEntryCardProps {
  * déjà connus pour ce jour-là, pour permettre de corriger facilement une
  * journée passée sans naviguer ailleurs dans l'app.
  */
-export function DayEntryCard({ entries, onSaved }: DayEntryCardProps) {
+export function DayEntryCard({ entries, dailyLogs, onSaved }: DayEntryCardProps) {
   const [date, setDate] = useState(todayISO());
   const [showDateEdit, setShowDateEdit] = useState(false);
   // Vrai dès que l'utilisateur a choisi une date lui-même : on cesse alors
@@ -39,8 +41,8 @@ export function DayEntryCard({ entries, onSaved }: DayEntryCardProps) {
   const [period, setPeriod] = useState(false);
   const periodTrackingEnabled = isPeriodTrackingEnabled();
 
-  // Recharge le poids (depuis les entrées déjà en mémoire) et le journal
-  // (depuis la base) à chaque changement de date, pour éditer ce jour-là.
+  // Recharge le poids (depuis les entrées déjà en mémoire) à chaque
+  // changement de date, pour éditer ce jour-là.
   // Volontairement déclenché par `date` seule et pas par `entries` : le
   // parent renvoie une nouvelle liste après chaque enregistrement, et
   // réagir à ce changement écraserait ce que l'utilisateur est en train de
@@ -50,13 +52,18 @@ export function DayEntryCard({ entries, onSaved }: DayEntryCardProps) {
     setWeightValue(existing ? formatKgValue(existing.weightKg) : "");
     setWeightError(null);
     setSavedFeedback(false);
+  }, [date]);
 
+  // Le journal, lui, se relit aussi quand le parent a rechargé les siens :
+  // la fiche du jour (tap sur le graphique) le modifie sans passer par cette
+  // carte, dont la copie locale restait sinon périmée (puce sport jamais verte).
+  useEffect(() => {
     getDailyLog(date).then((log) => {
       setSport(log?.sport ?? false);
       setFoodDeviation(log?.foodDeviation ?? false);
       setPeriod(log?.period ?? false);
     });
-  }, [date]);
+  }, [date, dailyLogs]);
 
   // L'app peut rester des jours en arrière-plan sur l'écran d'accueil iPhone.
   // Sans ce recalage, on rouvrirait la saisie encore pointée sur la veille et

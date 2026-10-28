@@ -1,6 +1,8 @@
 import { Bar, Cell, Line, YAxis } from "recharts";
 import { isWeekend } from "../../utils/date";
 import type { WeightSeriesPoint } from "../../domain/weightSeries";
+import type { WeightExtremes } from "../../domain/weightExtremes";
+import { formatKgValue } from "./weightFormat";
 import "./weightChartCommon.css";
 
 /**
@@ -53,9 +55,16 @@ export function WeightDot(props: {
   payload?: WeightSeriesPoint;
   index?: number;
   onSelect?: (date: string) => void;
+  extremes?: WeightExtremes | null;
+  /** Nombre de jours de la série, pour savoir quand `index` frôle un bord. */
+  pointCount?: number;
 }) {
-  const { cx, cy, payload, index, onSelect } = props;
+  const { cx, cy, payload, index, onSelect, extremes, pointCount } = props;
   if (cx == null || cy == null || !payload || payload.weightKg == null) return null;
+
+  const isMax = extremes?.max.date === payload.date;
+  const isMin = extremes?.min?.date === payload.date;
+  const edge = labelEdge(index, pointCount);
 
   return (
     <g key={index}>
@@ -66,6 +75,8 @@ export function WeightDot(props: {
       )}
       <DayMarker cx={cx} cy={cy - MARKER_OFFSET} shown={payload.foodDeviation === true} color="var(--color-alert)" />
       <DayMarker cx={cx} cy={cy + MARKER_OFFSET} shown={payload.sport === true} color="var(--color-success)" />
+      {isMax && <ExtremeLabel cx={cx} y={cy - EXTREME_OFFSET_ABOVE} kg={payload.weightKg} edge={edge} />}
+      {isMin && <ExtremeLabel cx={cx} y={cy + EXTREME_OFFSET_BELOW} kg={payload.weightKg} edge={edge} />}
       {onSelect && (
         <circle
           cx={cx}
@@ -78,6 +89,59 @@ export function WeightDot(props: {
           onClick={() => onSelect(payload.date)}
         />
       )}
+    </g>
+  );
+}
+
+const EXTREME_LABEL_HEIGHT = 15;
+/**
+ * Distance entre le point et le bord de l'étiquette le plus proche : 21 px,
+ * soit au-delà du halo d'une pastille (13 + 5,5 = 18,5 px). L'étiquette se
+ * pose donc AU-DESSUS / EN DESSOUS de la pastille éventuelle, sans la couvrir.
+ */
+const EXTREME_OFFSET_ABOVE = 21 + EXTREME_LABEL_HEIGHT;
+const EXTREME_OFFSET_BELOW = 21;
+/** Largeur approchée d'un chiffre / d'une virgule à 11 px, plus le remplissage. */
+const EXTREME_CHAR_WIDTH = 6.2;
+const EXTREME_PADDING_X = 8;
+/** Nombre de jours, à chaque bord, où l'étiquette est décalée plutôt que centrée. */
+const EDGE_DAYS = 2;
+
+/**
+ * Près d'un bord, une étiquette centrée sur le point déborderait du cadre
+ * (l'axe Y à gauche, la marge à droite) : on l'aligne alors sur le point, du
+ * côté où il y a de la place.
+ */
+function labelEdge(index?: number, pointCount?: number): "start" | "end" | null {
+  if (index == null || pointCount == null) return null;
+  if (index < EDGE_DAYS) return "start";
+  if (index >= pointCount - EDGE_DAYS) return "end";
+  return null;
+}
+
+/**
+ * Valeur du poids max / min. Fond opaque de la couleur de la carte, comme le
+ * halo des pastilles : l'étiquette reste lisible par-dessus la grille, la
+ * courbe de tendance ou la ligne d'objectif, qu'elle coupe net.
+ */
+function ExtremeLabel({ cx, y, kg, edge }: { cx: number; y: number; kg: number; edge: "start" | "end" | null }) {
+  const text = formatKgValue(kg);
+  const width = text.length * EXTREME_CHAR_WIDTH + EXTREME_PADDING_X;
+  const x = edge === "start" ? cx - 8 : edge === "end" ? cx + 8 - width : cx - width / 2;
+  return (
+    <g>
+      <rect
+        x={x}
+        y={y}
+        width={width}
+        height={EXTREME_LABEL_HEIGHT}
+        rx={4}
+        fill="var(--color-surface-raised)"
+        stroke="var(--color-border)"
+      />
+      <text x={x + width / 2} y={y + EXTREME_LABEL_HEIGHT / 2} className="weight-extreme-label">
+        {text}
+      </text>
     </g>
   );
 }

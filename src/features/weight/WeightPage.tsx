@@ -108,7 +108,7 @@ export function WeightPage() {
 
           <WeightSummaryCard latestEntry={latestEntry} goal={goal} />
 
-          <DayEntryCard entries={entries} onSaved={refresh} />
+          <DayEntryCard entries={entries} dailyLogs={dailyLogs} onSaved={refresh} />
 
           <WeightChart series={series} hasGoal={goal !== null} onSelectDate={setSelectedDate} />
 

@@ -2,6 +2,15 @@
   cursor: pointer;
 }
 
+.weight-extreme-label {
+  font-size: 11px;
+  font-weight: 600;
+  fill: var(--color-ink);
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+}
+
 .chart-legend {
   display: flex;
   gap: var(--space-m);

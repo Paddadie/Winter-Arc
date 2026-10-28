@@ -3,3 +3,8 @@ dist
 dist-ssr
 *.local
 .DS_Store
+
+# Config Claude : local uniquement
+.claude/
+CLAUDE.md
+CLAUDE.local.md

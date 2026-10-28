@@ -14,6 +14,7 @@ import { todayISO, formatDayMonth } from "../../utils/date";
 import { WeightDot, Legend, DayHighlights, TrendLine } from "./weightChartCommon";
 import { isPeriodTrackingEnabled } from "./periodTrackingPref";
 import type { WeightSeriesPoint } from "../../domain/weightSeries";
+import { findWeightExtremes } from "../../domain/weightExtremes";
 import "./WeightChart.css";
 
 interface WeightChartProps {
@@ -33,13 +34,15 @@ export function WeightChart({ series, hasGoal, onSelectDate }: WeightChartProps)
   // calcul : tous deux peuvent s'éloigner beaucoup des pesées et écraseraient
   // la courbe de poids, qui est le sujet du graphique.
   //
-  // Un kilo entier sous la pesée la plus basse. En haut, 0,5 kg de marge AVANT
-  // l'arrondi : la pastille « écart » est dessinée 13 px au-dessus du point et
-  // le rognage la couperait si le point le plus lourd frôlait le bord.
+  // Un kilo entier sous la pesée la plus basse. En haut, 1 kg de marge AVANT
+  // l'arrondi : la pastille « écart » (13 px) puis l'étiquette du max (jusqu'à
+  // 36 px au-dessus du point) seraient rognées si le point le plus lourd
+  // frôlait le bord.
   const shownWeights = series.map((p) => p.weightKg).filter((weight): weight is number => weight !== null);
+  const extremes = findWeightExtremes(series);
   const yDomain: [number | string, number | string] =
     shownWeights.length > 0
-      ? [Math.floor(Math.min(...shownWeights)) - 1, Math.ceil(Math.max(...shownWeights) + 0.5)]
+      ? [Math.floor(Math.min(...shownWeights)) - 1, Math.ceil(Math.max(...shownWeights) + 1)]
       : ["dataMin - 1", "dataMax + 1"];
   // `allowDataOverflow` : sans lui, Recharts ne pose aucun clip-path et une
   // valeur hors domaine — la tendance prolongée jusqu'au bord gauche,
@@ -102,7 +105,7 @@ export function WeightChart({ series, hasGoal, onSelectDate }: WeightChartProps)
                 dataKey="weightKg"
                 stroke="var(--color-coral)"
                 strokeWidth={2.5}
-                dot={<WeightDot onSelect={onSelectDate} />}
+                dot={<WeightDot onSelect={onSelectDate} extremes={extremes} pointCount={series.length} />}
                 activeDot={false}
                 isAnimationActive={false}
                 connectNulls={false}
